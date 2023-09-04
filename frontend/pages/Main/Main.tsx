@@ -77,14 +77,25 @@ const Main: React.FC = () : ReactElement => {
               <Route path = "/custom">Custom Rules</Route> */}
 
               <ul>
-                <li><a href= "#">New Game</a></li>
+                <li><a href= "#">New Online Game</a></li>
                 <li><a>Watch</a></li>
-                <li><a>Chat</a></li>
-                <li><a>Famous Games</a></li>
-                <li><a>Puzzles</a></li>
-                <li><a>Play a bot</a></li>
-                <li><a>Build a Bot</a></li>
-                <li><a>Custom Rules</a></li>
+                <li><a>Old games</a></li>
+                <li><a>Change Mode</a></li>
+                  <ul>
+                    <li><a>Classic</a></li>
+                    <li><a>Custom</a></li>
+                    <li><a>Practice</a></li>
+                    <li><a>5 Second Moves</a></li>
+                    <li><a>Tag Team</a></li>
+                    <li><a>Tag Team 5 Sec</a></li>
+                    <li><a>Practice</a></li>
+                  </ul>
+
+                {/* <li><a>Famous Games</a></li> */}
+                {/* <li><a>Puzzles</a></li> */}
+                {/* <li><a>Play a bot</a></li> */}
+                {/* <li><a>Build a Bot</a></li> */}
+                {/* <li><a>Custom Rules</a></li> */}
               </ul>
             {/* </Routes> */}
           </div>

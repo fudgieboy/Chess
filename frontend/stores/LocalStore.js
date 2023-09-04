@@ -8,7 +8,7 @@ class LocalStore extends EventEmitter {
     
     getLoggedIn=()=>{ 
         var loggedInCookie = document.cookie.replace(/(?:(?:^|.*;\s*)loggedIn\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-        if(loggedInCookie !== undefined && loggedInCookie.length > 0){
+        if(loggedInCookie !== undefined && loggedInCookie == true){
             return true;
         } else {
             return false;
@@ -18,7 +18,7 @@ class LocalStore extends EventEmitter {
     getLoginExpiryTime(){
         var loggedInCookieExpiry = document.cookie.replace(/(?:(?:^|.*;\s*)expiryTime\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 
-        if( loggedInCookieExpiry !== undefined && loggedInCookieExpiry.length > 0){
+        if(loggedInCookie !== undefined && loggedInCookie == true){
             return parseInt(loggedInCookieExpiry) - new Date().getTime();
         } else {
             return 0;

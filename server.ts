@@ -146,12 +146,14 @@ wss.on('connection', function connection(ws) {
   };
 
   ws.on('message', function message(data) {
-    console.log("user connected");
-    
     const inputCommands = JSON.parse(data.toString());
 
     if(inputCommands.command == "getValidMoves"){
-      const moves = gamelogic.getValidMoves(inputCommands.location);
+      const moves = gamelogic.getValidMoves(inputCommands.location, (val, newMoves)=>{
+
+        newMoves.push(val);
+        return newMoves;
+      }, {noStop: false, pinCheck: true});
       ws.send(JSON.stringify({command: "receiveMoves", movelist: moves}));
     }
     
@@ -163,16 +165,27 @@ wss.on('connection', function connection(ws) {
               moveTime: moveTime
       };
       
-      const completed = gamelogic.movePiece(moveData);
+      const gameResponse = gamelogic.movePiece(moveData);
 
-      if(completed){
-        ws.send(JSON.stringify({command: "finishMove", completeTime: new Date(), moveID: v4(), location: inputCommands.location, target: inputCommands.target}));
+      if(gameResponse.completed == true){ 
+        // authoritatively respond with newboard
 
+        ws.send(JSON.stringify({command: "finishMove", completeTime: new Date(), moveID: v4(), newBoard: gameResponse.newBoard, location: inputCommands.location, target: inputCommands.target}));
         wss.clients.forEach( (client) => {
           if(ws!=client){
-            client.send(JSON.stringify({command: "finishForeignMove", location: inputCommands.location, target: inputCommands.target}));
+            client.send(JSON.stringify({command: "finishForeignMove", newBoard: gameResponse.newBoard, completeTime: new Date(), moveID: v4(), location: inputCommands.location, target: inputCommands.target}));
           }
         });
+      } else {
+        //error in moving piece 
+        // ws.send(JSON.stringify({command: "finishMove", completeTime: new Date(), moveID: v4(), location: inputCommands.location, target: inputCommands.target}));
+
+        // wss.clients.forEach( (client) => {
+        //   if(ws!=client){
+        //     client.send(JSON.stringify({command: "finishForeignMove", location: inputCommands.location, target: inputCommands.target}));
+        //   }
+        // }); {
+
       }
     }
   });
