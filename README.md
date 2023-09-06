@@ -1,4 +1,4 @@
-ChessRTS.com
+[ChessRTS.com](http://chessrts.com:8080/)
 
 Multiplayer MERN app on AWS EC2 instance using the websockets library.
 
