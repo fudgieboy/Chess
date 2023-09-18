@@ -1,6 +1,6 @@
 [ChessRTS.com](http://chessrts.com:8080/)
 
-Socket-based Multiplayer MERN app on AWS EC2 instance. You can play against other people on different machines.
+Socket-based Multiplayer MERN app on AWS EC2 instance. You can play against other people on different machines. The game starts in such a state that only black can move.
 
 Chess without turns designed in such a way that the grid can be expanded to 80 x 80, with multiple teams, and multiple players on each team, and pieces that can move freely with either cooldowns for the player, or cooldowns for the piece or both.
 
