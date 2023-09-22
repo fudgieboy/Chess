@@ -13,7 +13,6 @@ import _ from "lodash";
 //checkmate isn't properly calculated when the king can't move into a square that the other king is attacking
 //use bitflags OMG LOL
 
-
 //stalemate
 //draw by repetition or perepetual check
 //draw by 50 move rule
@@ -237,6 +236,7 @@ const Gamelogic = () => {
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "king white", "", "", ""]
   ]; 
+
   let basicPositions: Array<string[]> = [ 
     ["king black", "", "", "queen black", "queen black", "", "", ""],
     ["", "", "", "", "", "", "", ""],
@@ -585,299 +585,6 @@ const Gamelogic = () => {
     return positions;
   }
   
-
-  function getValidLaterals (positions:Coords[], currentPiece:Chesspiece, range:Range, operation:Function, options):Coords[]{
-
-    let maxRange:string|number = 2;
-
-    if(range.x === range.y){
-      if(range.x == "max"){
-        maxRange = GRIDWIDTH;
-      } else {
-        maxRange = range.x;
-      }
-    } else {
-        maxRange = range.x;
-    }
-
-    let i:number, j:number, k:number, l: number;
-    const curPos = currentPiece.getBoardPosition();
-    const current = {x:curPos[0], y:curPos[1]};
-    
-    k = l = current.x;
-    i = j = current.y;
-    let iPos:string, kPos:string, jPos:string, lPos:string;
-    let kPinned, iPinned, jPinned, lPinned;
-    let rightwardHit:boolean, leftwardHit:boolean, downwardHit:boolean, upwardHit:boolean;
-    rightwardHit = leftwardHit = downwardHit = upwardHit = false;
-
-    let kBlocked = false;
-    let jBlocked = false;
-    let iBlocked = false; 
-    let lBlocked = false;
-
-    let pinnedPiece: Chesspiece;
-
-    let x = current.x; //duplicate, refactor current
-    let y = current.y;
-    
-    let king = currentPiece.pieceType == "king"? true: false;
-    let color = currentPiece.pieceColor;
-   
-    //check if you are pinned so you can clear being pinned if you are no longer pinned
-    //before piece moved check if piece is pinned. After piece moves check if king is in check
-      
-    //do diagonal and lateral check for king to see if it is under attack + pawn and knight check
-    
-    //if fpos is true, check if its a king. if it's a king its in check
-    //if it's not a king keep looking to see if the king is behind it. if true. piece is pinned.
-    //set the pieces behind any piece found to blocked from that attack
-
-      //add the location of the pinned piece to the king's attacked square but make sure to flag blocked or unblocked
-      //if the square is being attacked but it is blocked then the piece that is pinned cannot move.
-      //when moving any piece check their king to see if they are pinned. if they are pinned they cannot move
-      //if current is a king, flag moves into attacked squares as illegal. illegal moves are different from not having a move
-
-    let jPositions = [];
-    let kPositions = [];
-    let lPositions = [];
-    let iPositions = [];
-
-    let kDist = 0;
-    let lDist = 0;
-    let iDist = 0;
-    let jDist = 0;
-
-    while(!rightwardHit || !leftwardHit || !downwardHit || !upwardHit){  
-        if(i != current.y && !rightwardHit){ // upward
-          let kingLocation = undefined;
-          let pinnedPiece = undefined;
-    
-          if(iDist == 0 && !iBlocked){
-            iPos = basicPositions[current.x][i]; 
-            iPinned = getPieceByCoords({x: current.x, y: i});
-            iPositions.push({x: current.x, y: i});
-          }
-          
-          if(iPos.length || iBlocked){ 
-            iPositions.push({x: current.x, y: i});
-
-            if(iDist >= 1){
-              iBlocked = true;
-            }
-
-            iDist += 1;
-     
-            if( basicPositions[current.x][i] == "king black"){
-              kingLocation = {x: current.x, y: i};
-              // rightwardHit = true;
-              pinnedPiece = iPinned;
-            } else if (   basicPositions[current.x][i] == "king white" ){
-              kingLocation = {x: current.x, y: i};
-              // rightwardHit = true;
-              pinnedPiece = iPinned;
-            } else if ( basicPositions[current.x][i] != "" && basicPositions[current.x][i] != iPos){
-              pinnedPiece = iPinned;
-              rightwardHit = true;
-            }
-          }
-    
-          let illegal = false; 
-
-          if(iPos == "king " + opp[currentPiece.pieceColor]){
-            iBlocked = false;
-          } 
-          
-          positions = operation({ x: current.x, y: i, 
-                                  blocked: iBlocked, 
-                                  kingLocation: kingLocation, 
-                                  pinnedPositions: iPositions, 
-                                  illegal: illegal, 
-                                  pinnedPiece: pinnedPiece}, 
-                                  positions);
-            
-          } else if (i == current.y){
-            iPositions.push({x: current.x, y: i});
-          }
-        i = i+1;
-
-
-        if(j != current.y && !leftwardHit){ // upward
-          let kingLocation = undefined;
-          let pinnedPiece = undefined;
-    
-          if(jDist == 0 && !jBlocked){
-            jPos = basicPositions[current.x][j]; 
-            jPinned = getPieceByCoords({x: current.x, y: j});
-            jPositions.push({x: current.x, y: j});
-          }
-          
-          if(jPos.length || jBlocked){ 
-            jPositions.push({x: current.x, y: j});
-
-            if(jDist >= 1){
-              jBlocked = true;
-            }
-
-            jDist += 1;
-     
-            if(  basicPositions[current.x][j] == "king black"){
-              kingLocation = {x: current.x, y: j};
-              // leftwardHit = true;
-              pinnedPiece = jPinned;
-            } else if (  basicPositions[current.x][j] == "king white" ){
-              kingLocation = {x: current.x, y: j};
-              // leftwardHit = true;
-              pinnedPiece = jPinned;
-            } else if ( basicPositions[current.x][j] != "" && basicPositions[current.x][j] != jPos){
-              pinnedPiece = jPinned;
-              leftwardHit = true;
-            }
-          }
-    
-          let illegal = false; 
-
-          if(jPos == "king " + opp[currentPiece.pieceColor]){
-            jBlocked = false;
-          } 
-          
-          positions = operation({ x: current.x, y: j, 
-                                  blocked: jBlocked, 
-                                  kingLocation: kingLocation, 
-                                  pinnedPositions: jPositions, 
-                                  illegal: illegal, 
-                                  pinnedPiece: pinnedPiece}, 
-                                  positions);
-            
-          } else if (j == current.y){
-            jPositions.push({x: current.x, y: j});
-          }
-        j = j-1;
-
-
-      if(k != current.x && !downwardHit){ // upward
-        let kingLocation = undefined;
-        let pinnedPiece = undefined;
-  
-        if(kDist == 0 && !kBlocked){
-          kPos = basicPositions[k][current.y]; 
-          kPinned = getPieceByCoords({x: k, y: current.y});
-          kPositions.push({x: k, y: current.y});
-        }
-        
-        if(kPos.length || kBlocked){ 
-          kPositions.push({x: k, y: current.y});
-
-          if(kDist >= 1){
-            kBlocked = true;
-          }
-
-          kDist += 1;
-   
-          if( basicPositions[k][current.y] == "king black"){
-            kingLocation = {x: k, y: current.y};
-            // downwardHit = true;
-            pinnedPiece = kPinned;
-          } else if (   basicPositions[k][current.y] == "king white" ){
-            kingLocation = {x: k, y: current.y};
-            // downwardHit = true;
-            pinnedPiece = kPinned;
-          } else if ( basicPositions[k][current.y] != "" && basicPositions[k][current.y] != kPos){
-            pinnedPiece = kPinned;
-            downwardHit = true;
-          }
-        } 
-  
-        let illegal = false; 
-
-        if(kPos == "king " + opp[currentPiece.pieceColor]){
-          kBlocked = false;
-        }
-        
-        positions = operation({ x: k, y:current.y, 
-                                blocked: kBlocked, 
-                                kingLocation: kingLocation, 
-                                pinnedPositions: kPositions, 
-                                illegal: illegal, 
-                                pinnedPiece: pinnedPiece}, 
-                                positions);
-          
-        } else if (k == current.x){
-          kPositions.push({x: k, y: current.y});
-        }
-      k = k+1;
-
-
-
-      if(l != current.x && !upwardHit){ // upward
-        let kingLocation = undefined;
-        let pinnedPiece = undefined;
-  
-        if(lDist == 0 && !lBlocked){
-          lPos = basicPositions[l][current.y]; 
-          lPinned = getPieceByCoords({x: l, y: current.y});
-          lPositions.push({x: l, y: current.y});
-        }
-  
-        if(lPos.length || lBlocked){ 
-          lPositions.push({x: l, y: current.y});
-
-          if(lDist >= 1){
-            lBlocked = true;
-          }
-
-          lDist += 1;
-   
-          if( basicPositions[l][current.y] == "king black"){
-            kingLocation = {x: l, y: current.y};
-            // upwardHit = true;
-            pinnedPiece = lPinned;
-          } else if ( basicPositions[l][current.y] == "king white" ){
-            kingLocation = {x: l, y: current.y};
-            // upwardHit = true;
-            pinnedPiece = lPinned;
-          } else if ( basicPositions[l][current.y] != "" && basicPositions[l][current.y] != lPos){
-            pinnedPiece = lPinned;
-            upwardHit = true;
-          }
-        } 
-  
-        let illegal = false; 
-        
-        if(lPos == "king " + opp[currentPiece.pieceColor]){
-          lBlocked = false;
-        } 
-        
-        positions = operation({ x: l, y:current.y, 
-                                blocked: lBlocked, 
-                                kingLocation: kingLocation, 
-                                pinnedPositions: lPositions, 
-                                illegal: illegal, 
-                                pinnedPiece: pinnedPiece}, 
-                                positions);
-          
-        } else if (l == current.x){
-          lPositions.push({x: l, y: current.y});
-        }
-      l = l-1;
-
-
-      if(i == GRIDWIDTH || Math.abs(i) - parseInt(maxRange + "") == current.y){
-        rightwardHit = true;
-      }
-      if(j == -1 || Math.abs(j) + parseInt(maxRange + "") == current.y){
-        leftwardHit = true;
-      }
-      if(k == GRIDWIDTH || Math.abs(k) - parseInt(maxRange + "") == current.x){
-        downwardHit = true;
-      }
-      if(l == -1 || Math.abs(l) + parseInt(maxRange + "") == current.x ){
-        upwardHit = true;
-      }
-    } 
-
-    return positions;
-  }
   
   function getHorseyMoves (positions:Coords[], currentPiece:Chesspiece, operation:Function):Coords[]{
     const curPos = currentPiece.getBoardPosition();
@@ -1021,6 +728,301 @@ const Gamelogic = () => {
     return positions;
   }
    
+
+
+
+  function getValidLaterals (positions:Coords[], currentPiece:Chesspiece, range:Range, operation:Function, options):Coords[]{
+
+    let maxRange:string|number = 2;
+
+    if(range.x === range.y){
+      if(range.x == "max"){
+        maxRange = GRIDWIDTH;
+      } else {
+        maxRange = range.x;
+      }
+    } else {
+        maxRange = range.x;
+    }
+
+    let i:number, j:number, k:number, l: number;
+    const curPos = currentPiece.getBoardPosition();
+    const current = {x:curPos[0], y:curPos[1]};
+    
+    k = l = current.x;
+    i = j = current.y;
+    let iPos:string, kPos:string, jPos:string, lPos:string;
+    let kPinned, iPinned, jPinned, lPinned;
+    let rightwardHit:boolean, leftwardHit:boolean, downwardHit:boolean, upwardHit:boolean;
+    rightwardHit = leftwardHit = downwardHit = upwardHit = false;
+
+    let kBlocked = false;
+    let jBlocked = false;
+    let iBlocked = false; 
+    let lBlocked = false;
+
+    let pinnedPiece: Chesspiece;
+
+    let x = current.x; //duplicate, refactor current
+    let y = current.y;
+    
+    let king = currentPiece.pieceType == "king"? true: false;
+    let color = currentPiece.pieceColor;
+   
+    //check if you are pinned so you can clear being pinned if you are no longer pinned
+    //before piece moved check if piece is pinned. After piece moves check if king is in check
+      
+    //do diagonal and lateral check for king to see if it is under attack + pawn and knight check
+    
+    //if fpos is true, check if its a king. if it's a king its in check
+    //if it's not a king keep looking to see if the king is behind it. if true. piece is pinned.
+    //set the pieces behind any piece found to blocked from that attack
+
+      //add the location of the pinned piece to the king's attacked square but make sure to flag blocked or unblocked
+      //if the square is being attacked but it is blocked then the piece that is pinned cannot move.
+      //when moving any piece check their king to see if they are pinned. if they are pinned they cannot move
+      //if current is a king, flag moves into attacked squares as illegal. illegal moves are different from not having a move
+
+    let jPositions = [];
+    let kPositions = [];
+    let lPositions = [];
+    let iPositions = [];
+
+    let kDist = 0;
+    let lDist = 0;
+    let iDist = 0;
+    let jDist = 0;
+
+    while(!rightwardHit || !leftwardHit || !downwardHit || !upwardHit){  
+        if(i != current.y && !rightwardHit){ // upward
+          let kingLocation = undefined;
+          let pinnedPiece = undefined;
+    
+          if(iDist == 0 && !iBlocked){
+            iPos = basicPositions[current.x][i]; 
+            iPinned = getPieceByCoords({x: current.x, y: i});
+            iPositions.push({x: current.x, y: i});
+          }
+          
+          if(iPos.length || iBlocked){ 
+            iPositions.push({x: current.x, y: i});
+
+            if(iDist >= 1){
+              iBlocked = true;
+            }
+
+            iDist += 1;
+     
+            if( basicPositions[current.x][i] == "king black"){
+              kingLocation = {x: current.x, y: i};
+              rightwardHit = true;
+              pinnedPiece = iPinned;
+            } else if (   basicPositions[current.x][i] == "king white" ){
+              kingLocation = {x: current.x, y: i};
+              rightwardHit = true;
+              pinnedPiece = iPinned;
+            } else if ( basicPositions[current.x][i] != "" && basicPositions[current.x][i] != iPos){
+              pinnedPiece = iPinned;
+              rightwardHit = true;
+            }
+          }
+    
+          let illegal = false; 
+
+          if(iPos == "king " + opp[currentPiece.pieceColor]){
+            iBlocked = false;
+          } 
+          
+          positions = operation({ x: current.x, y: i, 
+                                  blocked: iBlocked, 
+                                  kingLocation: kingLocation, 
+                                  pinnedPositions: iPositions, 
+                                  illegal: illegal, 
+                                  pinnedPiece: pinnedPiece}, 
+                                  positions);
+            
+          } else if (i == current.y){
+            iPositions.push({x: current.x, y: i});
+          }
+        i = i+1;
+
+
+        if(j != current.y && !leftwardHit){ // upward
+          let kingLocation = undefined;
+          let pinnedPiece = undefined;
+    
+          if(jDist == 0 && !jBlocked){
+            jPos = basicPositions[current.x][j]; 
+            jPinned = getPieceByCoords({x: current.x, y: j});
+            jPositions.push({x: current.x, y: j});
+          }
+          
+          if(jPos.length || jBlocked){ 
+            jPositions.push({x: current.x, y: j});
+
+            if(jDist >= 1){
+              jBlocked = true;
+            }
+
+            jDist += 1;
+     
+            if(  basicPositions[current.x][j] == "king black"){
+              kingLocation = {x: current.x, y: j};
+              leftwardHit = true;
+              pinnedPiece = jPinned;
+            } else if (  basicPositions[current.x][j] == "king white" ){
+              kingLocation = {x: current.x, y: j};
+              leftwardHit = true;
+              pinnedPiece = jPinned;
+            } else if ( basicPositions[current.x][j] != "" && basicPositions[current.x][j] != jPos){
+              pinnedPiece = jPinned;
+              leftwardHit = true;
+            }
+          }
+    
+          let illegal = false; 
+
+          if(jPos == "king " + opp[currentPiece.pieceColor]){
+            jBlocked = false;
+          } 
+          
+          positions = operation({ x: current.x, y: j, 
+                                  blocked: jBlocked, 
+                                  kingLocation: kingLocation, 
+                                  pinnedPositions: jPositions, 
+                                  illegal: illegal, 
+                                  pinnedPiece: pinnedPiece}, 
+                                  positions);
+            
+          } else if (j == current.y){
+            jPositions.push({x: current.x, y: j});
+          }
+        j = j-1;
+
+
+      if(k != current.x && !downwardHit){ // upward
+        let kingLocation = undefined;
+        let pinnedPiece = undefined;
+  
+        if(kDist == 0 && !kBlocked){
+          kPos = basicPositions[k][current.y]; 
+          kPinned = getPieceByCoords({x: k, y: current.y});
+          kPositions.push({x: k, y: current.y});
+        }
+        
+        if(kPos.length || kBlocked){ 
+          kPositions.push({x: k, y: current.y});
+
+          if(kDist >= 1){
+            kBlocked = true;
+          }
+
+          kDist += 1;
+   
+          if( basicPositions[k][current.y] == "king black"){
+            kingLocation = {x: k, y: current.y};
+            downwardHit = true;
+            pinnedPiece = kPinned;
+          } else if (   basicPositions[k][current.y] == "king white" ){
+            kingLocation = {x: k, y: current.y};
+            downwardHit = true;
+            pinnedPiece = kPinned;
+          } else if ( basicPositions[k][current.y] != "" && basicPositions[k][current.y] != kPos){
+            pinnedPiece = kPinned;
+            downwardHit = true;
+          }
+        } 
+  
+        let illegal = false; 
+
+        if(kPos == "king " + opp[currentPiece.pieceColor]){
+          kBlocked = false;
+        }
+        
+        positions = operation({ x: k, y:current.y, 
+                                blocked: kBlocked, 
+                                kingLocation: kingLocation, 
+                                pinnedPositions: kPositions, 
+                                illegal: illegal, 
+                                pinnedPiece: pinnedPiece}, 
+                                positions);
+          
+        } else if (k == current.x){
+          kPositions.push({x: k, y: current.y});
+        }
+      k = k+1;
+
+
+
+      if(l != current.x && !upwardHit){ // upward
+        let kingLocation = undefined;
+        let pinnedPiece = undefined;
+  
+        if(lDist == 0 && !lBlocked){
+          lPos = basicPositions[l][current.y]; 
+          lPinned = getPieceByCoords({x: l, y: current.y});
+          lPositions.push({x: l, y: current.y});
+        }
+  
+        if(lPos.length || lBlocked){ 
+          lPositions.push({x: l, y: current.y});
+
+          if(lDist >= 1){
+            lBlocked = true;
+          }
+
+          lDist += 1;
+   
+          if( basicPositions[l][current.y] == "king black"){
+            kingLocation = {x: l, y: current.y};
+            upwardHit = true;
+            pinnedPiece = lPinned;
+          } else if ( basicPositions[l][current.y] == "king white" ){
+            kingLocation = {x: l, y: current.y};
+            upwardHit = true;
+            pinnedPiece = lPinned;
+          } else if ( basicPositions[l][current.y] != "" && basicPositions[l][current.y] != lPos){
+            pinnedPiece = lPinned;
+            upwardHit = true;
+          }
+        } 
+  
+        let illegal = false; 
+        
+        if(lPos == "king " + opp[currentPiece.pieceColor]){
+          lBlocked = false;
+        } 
+        
+        positions = operation({ x: l, y:current.y, 
+                                blocked: lBlocked, 
+                                kingLocation: kingLocation, 
+                                pinnedPositions: lPositions, 
+                                illegal: illegal, 
+                                pinnedPiece: pinnedPiece}, 
+                                positions);
+          
+        } else if (l == current.x){
+          lPositions.push({x: l, y: current.y});
+        }
+      l = l-1;
+
+
+      if(i == GRIDWIDTH || Math.abs(i) - parseInt(maxRange + "") == current.y){
+        rightwardHit = true;
+      }
+      if(j == -1 || Math.abs(j) + parseInt(maxRange + "") == current.y){
+        leftwardHit = true;
+      }
+      if(k == GRIDWIDTH || Math.abs(k) - parseInt(maxRange + "") == current.x){
+        downwardHit = true;
+      }
+      if(l == -1 || Math.abs(l) + parseInt(maxRange + "") == current.x ){
+        upwardHit = true;
+      }
+    } 
+
+    return positions;
+  }
   
   function getValidDiagonals (positions:Coords[], currentPiece:Chesspiece, range:Range, operation:Function, options):Coords[]{
     const curPos = currentPiece.getBoardPosition();
@@ -1101,12 +1103,12 @@ const Gamelogic = () => {
 
         if(  basicPositions[xplus][yplus] == "king black"){
           kingLocation = {x: xplus, y: yplus};
-          // br = true;
+          br = true;
           pinnedPiece = lPinned;
           } else if ( basicPositions[xplus][yplus] == "king white" ){
         
           kingLocation = {x: xplus, y: yplus};
-          // br = true;
+          br = true;
           pinnedPiece = lPinned;
         } else if ( basicPositions[xplus][yplus] != "" && basicPositions[xplus][yplus] != lPos){
           pinnedPiece = lPinned;
@@ -1155,13 +1157,12 @@ const Gamelogic = () => {
  
 
         if( basicPositions[xplus][yminus] == "king black"){
-          // console.log('iPos = king black');
           kingLocation = {x: xplus, y: yminus};
-          // bl = true;
+          bl = true;
           pinnedPiece = iPinned;
           } else if (basicPositions[xplus][yplus] == "king white" ){
           kingLocation = {x: xplus, y: yminus};
-          // bl = true;
+          bl = true;
           pinnedPiece = iPinned;
         } else if ( basicPositions[xplus][yminus] != "" && basicPositions[xplus][yminus] != iPos){
           pinnedPiece = iPinned;
@@ -1211,11 +1212,11 @@ const Gamelogic = () => {
         if(basicPositions[xminus][yminus] == "king black"){
           // console.log('jPos = king black');
           kingLocation = {x: xminus, y: yminus};
-          // tl = true;
+          tl = true;
           pinnedPiece = jPinned;
           } else if (basicPositions[xminus][yminus] == "king white" ){
           kingLocation = {x: xminus, y: yminus};
-          // tl = true;
+          tl = true;
           pinnedPiece = jPinned;
         } else if ( basicPositions[xminus][yminus] != "" && basicPositions[xminus][yminus] != jPos){
           pinnedPiece = jPinned;
@@ -1263,9 +1264,11 @@ const Gamelogic = () => {
  
         if(basicPositions[xminus][yplus] == "king black"){
           kingLocation = {x: xminus, y: yplus};
+          tr = true;
           pinnedPiece = kPinned;
           } else if (basicPositions[xminus][yplus] == "king white" ){
           kingLocation = {x: xminus, y: yplus};
+          tr = true;
           pinnedPiece = kPinned;
         } else if ( basicPositions[xminus][yplus] != "" && basicPositions[xminus][yplus] != kPos){
           pinnedPiece = kPinned;
