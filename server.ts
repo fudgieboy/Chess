@@ -94,12 +94,12 @@ if(curEnv == "production"){
 
 app.get("/", (req,res) => {
 
-  const message = {header: req.header, body: req.body, query: req.query, cookies: req.cookies, userToken: req.userToken, curEnv: curEnv, ip: req.socket.remoteAddress};
+  // const message = {header: req.header, body: req.body, query: req.query, cookies: req.cookies, userToken: req.userToken, curEnv: curEnv, ip: req.socket.remoteAddress};
 
-  logger.log({
-    message: message,
-    level: 'info'
-  });
+  // logger.log({
+  //   message: message,
+  //   level: 'info'
+  // });
 
   res.render(path.resolve(__dirname, dirPrefix + "dist", "index.ejs"), {
     socketPort: WSPORT
@@ -144,10 +144,10 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', function message(data) {
 
-    slogger.log({
-      message: data.toString(),
-      level: 'info'
-    });
+    // slogger.log({
+    //   message: data.toString(),
+    //   level: 'info'
+    // });
     
     const inputCommands = JSON.parse(data.toString());
 
