@@ -1,55 +1,57 @@
 import React, {ReactElement, Component, useEffect, useState} from "react";
 import { Route, Routes } from 'react-router-dom';
-// import LocalStore from "../../stores/LocalStore";
 import Chessboard from "../../globalComponents/Chessboard"; 
+import Login from "../../globalComponents/partials/login";
+import Register from "../../globalComponents/partials/register";
+import LocalStore from "../../stores/LocalStore";
 
 const Main: React.FC = () : ReactElement => {
-  // const [loggedIn, setLoggedIn] = useState<boolean>(LocalStore.store.getLoggedIn());
-  // const [unmountLoginForms, setUnmountLoginForms] = useState<boolean>(LocalStore.store.getLoggedIn());
+  const [loggedIn, setLoggedIn] = useState<boolean>(LocalStore.store.getLoggedIn());
+  const [unmountLoginForms, setUnmountLoginForms] = useState<boolean>(LocalStore.store.getLoggedIn());
                  
-  // const updateLoggedInStatus = (loggedIn:boolean):void=>{
-  //   setLoggedIn(loggedIn);
-  // };
+  const updateLoggedInStatus = (loggedIn:boolean):void=>{
+    setLoggedIn(loggedIn);
+  };
 
-  // const updateMountStatus = (mount:boolean):void =>{
-  //   setUnmountLoginForms(mount);
-  // };
+  const updateMountStatus = (mount:boolean):void =>{
+    setUnmountLoginForms(mount);
+  };
 
-  // const revealLoginForms = (delay:number):void => { 
-  //   setTimeout(()=>{
-  //     updateLoggedInStatus(false);
-  //     updateMountStatus(false);
-  //   }, delay);
-  // };
+  const revealLoginForms = (delay:number):void => { 
+    setTimeout(()=>{
+      updateLoggedInStatus(false);
+      updateMountStatus(false);
+    }, delay);
+  };
 
-  // const hideLoginForms = (showDelayTime:number):void=>{
-  //   updateLoggedInStatus(true);
+  const hideLoginForms = (showDelayTime:number):void=>{
+    updateLoggedInStatus(true);
 
-  //   setTimeout(()=>{
-  //     updateMountStatus(true);
-  //   }, 1000); //1000 is the scss animation time
+    setTimeout(()=>{
+      updateMountStatus(true);
+    }, 1000); //1000 is the scss animation time
 
-  //   revealLoginForms(showDelayTime);
-  // };
+    revealLoginForms(showDelayTime);
+  };
 
-  // useEffect(()=>{
-  //   if(LocalStore.store.getLoggedIn()){
-  //     revealLoginForms(LocalStore.store.getLoginExpiryTime());
-  //   }
-  // }, []);
+  useEffect(()=>{
+    if(LocalStore.store.getLoggedIn()){
+      revealLoginForms(LocalStore.store.getLoginExpiryTime());
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     document.title = `Time is: ${new Date()}`;
-  //   }, 1000);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      document.title = `Time is: ${new Date()}`;
+    }, 1000);
  
-  //   return () => {
-  //     document.title = "Time stopped.";
-  //     clearInterval(intervalId);
-  //   };
-  // }, []);
+    return () => {
+      document.title = "Time stopped.";
+      clearInterval(intervalId);
+    };
+  }, []);
 
-  // var loginInnerContainerClasses = ( loggedIn ?"hidden": "") + " anim";
+  const loginInnerContainerClasses = ( loggedIn ?"hidden": "") + " anim";
 
   return (
     // <Router>
@@ -100,12 +102,12 @@ const Main: React.FC = () : ReactElement => {
             {/* </Routes> */}
           </div>
           <Chessboard />
-          {/* <div id = "loginFormsContainer">
+          <div id = "loginFormsContainer">
             <div className = {loginInnerContainerClasses} >
               {!unmountLoginForms ? <Register hideSelf = {hideLoginForms} showSelf = {revealLoginForms} /> :null}
               {!unmountLoginForms ? <Login  hideSelf = {hideLoginForms} showSelf = {revealLoginForms}/> :null}
             </div>
-          </div>  */}
+          </div>  
       </div>
     // </Router>
   );

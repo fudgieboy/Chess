@@ -227,25 +227,25 @@ const Gamelogic = () => {
   ];
 
   let initialPositions: Array<string[]> = [ 
-    ["king black", "", "", "queen black", "queen black", "", "", ""],
+    ["rook black", "knight black", "bishop black", "queen black", "king black", "bishop black", "knight black", "rook black"],
+    ["pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black"],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
-    ["rook black", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "queen white"],
     ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "king white", "", "", ""]
+    ["pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white"],
+    ["rook white", "knight white", "bishop white", "queen white", "king white", "bishop white", "knight white", "rook white"]
   ]; 
 
   let basicPositions: Array<string[]> = [ 
-    ["king black", "", "", "queen black", "queen black", "", "", ""],
+    ["rook black", "knight black", "bishop black", "queen black", "king black", "bishop black", "knight black", "rook black"],
+    ["pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black"],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
-    ["rook black", "", "", "", "", "", "", ""],
-    ["", "", "", "", "", "", "", "queen white"],
     ["", "", "", "", "", "", "", ""],
-    ["", "", "", "", "king white", "", "", ""]
+    ["pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white"],
+    ["rook white", "knight white", "bishop white", "queen white", "king white", "bishop white", "knight white", "rook white"]
   ];
  
   
@@ -1441,6 +1441,10 @@ const Gamelogic = () => {
 
     return {moves: moves, attackerOrigin: attackerOrigin, checkBlocked: checkBlocked, filteredMoves:filteredMoves, doubleCheck:doubleCheck};
   };
+
+  const getBasicBoard = () => { 
+    return basicPositions;
+  };
  
   const movePiece = (moveData):{completed: boolean, newBoard: string[][], gameState: string, captured:{capturedWhite: string[], capturedBlack:string[]}} =>{
 
@@ -1702,6 +1706,7 @@ const Gamelogic = () => {
 
 
   return {
+    getBasicBoard,
     getConstructedGrid,
     getValidMoves,
     movePiece,

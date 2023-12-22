@@ -76,6 +76,13 @@ button, input[type=submit], input[type=file]::file-selector-button{
     width: 75px;    
 }
 
+#userlist{
+    position: absolute;
+    height: 100%;
+    top: 100%;
+    z-index: 10;
+    font-size: 2em;
+}
 // .inputfile{
 //     float: right;
 // }
@@ -91,13 +98,6 @@ button, input[type=submit], input[type=file]::file-selector-button{
 #header a{
     color: white;
     text-decoration: none;
-}
-
-.deleteTodo{
-    background-color: $black;
-    color: $white;
-    float: right;
-    content: 'x'; // here is your X(cross) sign.
 }
 
 #mdiv {
@@ -205,6 +205,11 @@ button, input[type=submit], input[type=file]::file-selector-button{
     overflow: hidden;
     box-sizing: border-box;
     height: auto;
+    height: 100%;
+    width: 200px;
+    position: absolute;
+    right: 0px;
+    background-color: black;
 }
 
 .galleryContainer{

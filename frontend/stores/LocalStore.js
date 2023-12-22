@@ -3,12 +3,18 @@ import dispatcher from "./Dispatcher";
 
 class LocalStore extends EventEmitter {
     // getLoginToken=()=>{ return loginToken;}
-
     loginList = [];
+    requests = window.friendRequests;
+    friendList = window.friendList;
     
+    getFriendList=()=>{
+        return window.friendList;
+    };
+
     getLoggedIn=()=>{ 
         var loggedInCookie = document.cookie.replace(/(?:(?:^|.*;\s*)loggedIn\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-        if(loggedInCookie !== undefined && loggedInCookie == true){
+        
+        if(loggedInCookie !== undefined && (loggedInCookie == true || loggedInCookie == "true")){
             return true;
         } else {
             return false;
@@ -18,18 +24,24 @@ class LocalStore extends EventEmitter {
     getLoginExpiryTime(){
         var loggedInCookieExpiry = document.cookie.replace(/(?:(?:^|.*;\s*)expiryTime\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 
-        if(loggedInCookie !== undefined && loggedInCookie == true){
+        if(loggedInCookieExpiry !== undefined && loggedInCookieExpiry == true){
             return parseInt(loggedInCookieExpiry) - new Date().getTime();
         } else {
             return 0;
         }
     }
 
+    getFriendRequests(){
+        return this.requests;
+    } 
+
     setLogin(action){
         var delay = this.getLoginExpiryTime();
 
-        this.loginList = action.payload;
-        action.payload.callback(action.payload, delay);
+        this.loginList = action.payload.lists;
+        this.requests = action.payload.requests;
+
+        action.payload.callback(this.loginList, delay);
     }
 
     getLoginList=()=>{
@@ -37,7 +49,7 @@ class LocalStore extends EventEmitter {
     }
 
     setLogout(action){
-        action.payload.callback();
+        action.payload();
     }
 
     handleActions = (action) => {
@@ -58,20 +70,19 @@ class LocalStore extends EventEmitter {
 }
 
 class LoginActions {
-    loginUser(data, callback, error){
-        data.callback = callback;
+    loginUser(lists, requests, callback, error){
+        
         dispatcher.dispatch({
             type: "LOGIN_USER_STATUS",
-            payload: data,
+            payload: {lists, requests, callback},
             errors: error,
         });
     }
 
     logoutUser(data, callback, error){
-        data.callback = callback;
         dispatcher.dispatch({
             type: "LOGOUT_USER_STATUS",
-            payload: data,
+            payload: callback,
             errors: error,
         });
     }

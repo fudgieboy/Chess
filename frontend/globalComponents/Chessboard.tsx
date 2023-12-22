@@ -5,7 +5,7 @@ import Chesspiece from "./Pieces/Piece";
 // import LocalStore from "../stores/LocalStore";
 // import {getPieceFromType, PB} from "./Pieces/PieceTypes";
 import Gamelogic from "../../shared/gamelogic";
-
+import uniqid from 'uniqid';
 
 let socket;
 let WSHOST = window.location.host.split(":");
@@ -17,9 +17,12 @@ if(global.env !== "development") {
   socket = new WebSocket('ws://localhost:8081', "protocolOne");
 }
 
-socket.onopen = ()=>{
+socket.onopen = () => {
   console.log("socket opened on " + WSHOST);
+  const content = { command: "getInitialState"};
+  socket.send(JSON.stringify(content));
 };
+
 
 enum orientation {
   black= "down",
@@ -28,16 +31,19 @@ enum orientation {
 
 const gamelogic = Gamelogic();
 
-let initialPositions: Array<string[]> = [
-  ["king black", "", "", "queen black", "queen black", "", "", ""],
+let users = {};
+// const rooms = {};
+
+let initialPositions: Array<string[]> = [ 
+  ["rook black", "knight black", "bishop black", "queen black", "king black", "bishop black", "knight black", "rook black"],
+  ["pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black", "pawn black"],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
   ["", "", "", "", "", "", "", ""],
-  ["rook black", "", "", "", "", "", "", ""],
-  ["", "", "", "", "", "", "", "queen white"],
   ["", "", "", "", "", "", "", ""],
-  ["", "", "", "", "king white", "", "", ""]
-];   
+  ["pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white", "pawn white"],
+  ["rook white", "knight white", "bishop white", "queen white", "king white", "bishop white", "knight white", "rook white"]
+];
 
 const Chessboard: React.FC = (): ReactElement => {
 
@@ -67,13 +73,24 @@ const Chessboard: React.FC = (): ReactElement => {
       }catch(error){
         console.log("error in json parsing");
       }
-      
-      if(inputCommands && inputCommands.command == "receiveMoves"){
+
+      if(inputCommands && inputCommands.command == "returnInitialState"){
+        finishInitializtion(inputCommands.newBoard);
+      } else if(inputCommands && inputCommands.command == "receiveMoves"){
         recieveMoves(inputCommands.movelist);
       } else if(inputCommands && inputCommands.command == "finishForeignMove"){
         finishForeignMove( inputCommands.location, inputCommands.target, inputCommands.moveID, inputCommands.newBoard);
       } else if (inputCommands && inputCommands.command == "finishMove") {
         setDelayedEvents([...delayedEvents, inputCommands] ); 
+      } else if (inputCommands && inputCommands.command == "addRoom") {
+      } else if (inputCommands && inputCommands.command == "removeRoom") {
+      } else if (inputCommands && inputCommands.command == "addUser") {
+        users = inputCommands.users;
+        console.log(users);
+        setUserList(constructUserList());
+      } else if (inputCommands && inputCommands.command == "disconnectUser") {
+        users = inputCommands.users;
+        setUserList(constructUserList());
       }
     };
   }, []); //only run this on mount and unmount, not every render
@@ -88,6 +105,27 @@ const Chessboard: React.FC = (): ReactElement => {
   let highlightActive = false;
   
   let moveList = [];
+
+  const [userList, setUserList] = useState<JSX.Element[]>(
+    constructUserList()
+  );
+  
+  
+  function constructUserList() : JSX.Element[] {
+    const list:JSX.Element[] = [];
+
+    console.log(users);
+    
+    list.push(<div>
+      {Object.keys(users).map( (key) => {
+          return <div key = {uniqid()}>
+              <span>{key}</span>
+          </div>;
+        })}
+    </div>);
+
+    return list;
+  }
 
   const [constructedBoard, setConstructedBoard] = useState<Array<ReactElement[]>>(
     constructPositions()
@@ -176,6 +214,12 @@ const Chessboard: React.FC = (): ReactElement => {
     socket.send(JSON.stringify(content));
   }
 
+
+  function finishInitializtion(newBoard){
+    initialPositions = newBoard;
+    setConstructedBoard(constructPositions());
+  }
+
   function finishMovePiece(currentLocation, targetLocation, moveID, newBoard){ //probably should include pieceID
     
     if(completedMoves[moveID] == undefined || completedMoves[moveID] == false){
@@ -232,14 +276,16 @@ const Chessboard: React.FC = (): ReactElement => {
 
   return (
     <div id = "board">
-        <div className= "capturedWhite captured"></div>
+        {/* <div className= "capturedWhite captured">
           {capturedWhite}
+        </div> */}
         <div id ="innercontainer">
           {constructedBoard}
         </div>
-        <div className= "capturedBlack captured">
+        <div id = "userlist">{userList}</div>
+        {/* <div className= "capturedBlack captured">
           {capturedBlack}
-        </div>
+        </div> */}
     </div>
   );
 };

@@ -1,12 +1,15 @@
-// const connection = (creds) => {
-// 	const mongoose = require("mongoose");
-// 	var dbOptions = { useUnifiedTopology: true, useNewUrlParser: true, keepAlive: 300000, connectTimeoutMS: 30000};
-// 	mongoose.connect( creds , dbOptions);
-// 	mongoose.set("useCreateIndex", true);
-// 	const db = mongoose.connection;
-// 	// l(db);
-// };
+import mongoose from "mongoose";
 
-// export {
-// 	connection
-// };
+const connection = (creds) => {
+	const dbOptions = { useUnifiedTopology: true, useNewUrlParser: true};
+	// const dbOptions = { useUnifiedTopology: true, useNewUrlParser: true, keepAlive: "300000", connectTimeoutMS: "30000"};
+
+	// const db = mongoose.connection;
+	
+	mongoose.connect( creds.devUrl , dbOptions);
+	mongoose.set("useCreateIndex", true);
+};
+
+export {
+	connection
+};

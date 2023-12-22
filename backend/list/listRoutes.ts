@@ -1,10 +1,10 @@
-// const e = require("express");
-// const controller = require("./listController");
+import e from "express";
+import listController from "./listController";
 
-// const app = module.exports = e();
+const app = e();
 
-// app.post("/list/setList", controller.setList);
-// app.get("/list/getList", controller.getList);
+app.post("/list/setList", (req, res)=>{ return listController.setList(req, res);});
+app.post("/list/getList", (req, res)=>{ return listController.getList(req, res);});
 
 
-// export default {};
+export default app;

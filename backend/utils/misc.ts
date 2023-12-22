@@ -7,7 +7,6 @@ const curEnv = config.curEnv;
 const dev = (curEnv === "development");
 
 let l, e, tr, n;
-
 if(dev){
   // const prima = require('esprima');
   // var scan = require('scope-analyzer');
@@ -16,6 +15,10 @@ if(dev){
     throw `error, ${msg + " " + code}`;
   };
   
+  n = (val)=>{
+    return (val === undefined || val === null);
+  };
+
   // tr = (depth)=>{
   //   var t = stackTrace.get();
   //   var spacer = "";
@@ -27,16 +30,14 @@ if(dev){
   //   }
   // };
 } else {
-  tr = l = e = console.log = ()=>{};
-}
+  tr = l = e = n = console.log = ()=>{};
+} 
 
-n = (val)=>{
-  return (val === undefined || val === null);
-};
-
-export {
+const utils = {
   l,
   e,
   tr,
-  n,
+  n
 };
+
+export default utils;
