@@ -1,14 +1,11 @@
-import e from "express";
-import registerController from "./registerController";
-import loginController from "./loginController";
+// const e = require("express");
+// const registerController = require("./registerController");
+// const loginController = require("./loginController");
 
-const app = e();
+// const app = module.exports = e();
 
-app.post("/users/register", (req, res)=>{ return registerController.register(req, res);});
-app.post("/users/finishAddFriend", (req, res)=>{ return loginController.finishAddFriend(req, res);});
-app.post("/users/addFriend", (req, res)=>{ return loginController.createFriendRequest(req, res);});
-app.post("/users/login", (req, res)=>{ return loginController.login(req, res);});
-app.get("/users/user", (req, res)=>{ return loginController.getUserInfo(req, res);});
-app.get("/users/logout", (req, res)=>{ return  loginController.logout(req, res);});
+// app.post("/users/register", registerController.register);
+// app.post("/users/login", loginController.login);
+// app.get("/users/logout", loginController.logout);
 
-export default app;
+// export default {};

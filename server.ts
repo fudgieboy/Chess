@@ -15,8 +15,8 @@ import {WebSocketServer} from 'ws';
 import {connection} from "./backend/dataAccess/dbConnection";
 const uniqid = require("uniqid");
 
-import listRoutes from "./backend/list/listRoutes";
-import userRoutes from "./backend/users/userRoutes";
+//import listRoutes from "./backend/list/listRoutes";
+//import userRoutes from "./backend/users/userRoutes";
 
 const {n} = utils;
 
@@ -116,8 +116,8 @@ app.get("/", (req,res) => {
 }); 
  
 
-app.use(listRoutes);
-app.use(userRoutes);
+//app.use(listRoutes);
+//app.use(userRoutes);
 
 console.log("starting app...");
 
@@ -127,11 +127,8 @@ app.listen(port, ip, () => {
   console.log(colors.yellow(`Listening to app on ${port} in ${curEnv} mode`));
 });
 
-const gamelogic = Gamelogic();
- 
 const userIDs = {};
 let numPlayers = 0;
-// const waitingUsers = {};
 
 const updateAllInRoom = (ws, userIDs, action) => {
   wss.clients.forEach( (client) => {
@@ -369,7 +366,7 @@ wss.on('connection', function connection(ws) {
     const curSize = wss.clients.size;
     if(curSize < 2){
       console.log("game reset");
-      gamelogic.resetGame();
+      // gamelogic.resetGame();
       ws.send(JSON.stringify({command: "resetGame"}));
     }
     
