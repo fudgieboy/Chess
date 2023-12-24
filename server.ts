@@ -12,7 +12,7 @@ import Gamelogic from './shared/gamelogic';
 import {createServer} from 'http';
 import {v4} from 'uuid';
 import {WebSocketServer} from 'ws';
-import {connection} from "./backend/dataAccess/dbConnection";
+//import {connection} from "./backend/dataAccess/dbConnection";
 const uniqid = require("uniqid");
 
 //import listRoutes from "./backend/list/listRoutes";
@@ -62,7 +62,7 @@ const curEnv = config.curEnv;
 const dev = (curEnv === "development");
 require("pretty-error").start();
 
-connection(config.dbCreds);
+//connection(config.dbCreds);
 
 app.use(cookieParser(config.cookieSecret, { httpOnly: true })); 
 app.use(morgan("dev"));
@@ -121,9 +121,9 @@ app.get("/", (req,res) => {
 
 console.log("starting app...");
 
-const ip = dev ? "localhost":"0.0.0.0";
+//const ip = dev ? "localhost":"0.0.0.0";
 
-app.listen(port, ip, () => {
+app.listen(port, () => {
   console.log(colors.yellow(`Listening to app on ${port} in ${curEnv} mode`));
 });
 
