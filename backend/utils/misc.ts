@@ -33,11 +33,9 @@ if(dev){
   tr = l = e = n = console.log = ()=>{};
 } 
 
-const utils = {
+export {
   l,
   e,
   tr,
   n
 };
-
-export default utils;

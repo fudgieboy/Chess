@@ -31,8 +31,8 @@ enum orientation {
 
 const gamelogic = Gamelogic();
 
-let users = {};
-// const rooms = {};
+let users = [];
+let rooms = [];
 
 let initialPositions: Array<string[]> = [ 
   ["rook black", "knight black", "bishop black", "queen black", "king black", "bishop black", "knight black", "rook black"],
@@ -73,7 +73,7 @@ const Chessboard: React.FC = (): ReactElement => {
       }catch(error){
         console.log("error in json parsing");
       }
-
+      
       if(inputCommands && inputCommands.command == "returnInitialState"){
         finishInitializtion(inputCommands.newBoard);
       } else if(inputCommands && inputCommands.command == "receiveMoves"){
@@ -82,11 +82,13 @@ const Chessboard: React.FC = (): ReactElement => {
         finishForeignMove( inputCommands.location, inputCommands.target, inputCommands.moveID, inputCommands.newBoard);
       } else if (inputCommands && inputCommands.command == "finishMove") {
         setDelayedEvents([...delayedEvents, inputCommands] ); 
+      } else if (inputCommands && inputCommands.command == "updateRoomList") {
+        rooms = inputCommands.rooms;
+        setRoomList(constructRoomList());
       } else if (inputCommands && inputCommands.command == "addRoom") {
       } else if (inputCommands && inputCommands.command == "removeRoom") {
       } else if (inputCommands && inputCommands.command == "addUser") {
         users = inputCommands.users;
-        console.log(users);
         setUserList(constructUserList());
       } else if (inputCommands && inputCommands.command == "disconnectUser") {
         users = inputCommands.users;
@@ -110,19 +112,46 @@ const Chessboard: React.FC = (): ReactElement => {
     constructUserList()
   );
   
+  const [roomList, setRoomList] = useState<JSX.Element[]>(
+    constructRoomList()
+  );
+  
+  function joinRoom(e){
+    const content = {command: "joinRoom", targetRoomID: e.currentTarget.id};
+    socket.send(JSON.stringify(content));
+  }
+
+  function getRoomInfo(e){
+    const content = {command: "getRequestedRoomInfo", targetRoomID: e.currentTarget.id};
+    socket.send(JSON.stringify(content));
+  }
+  
+  function constructRoomList() : JSX.Element[] {
+    const list:JSX.Element[] = [];
+
+    for(let k = 0; k < rooms.length; k++){
+      list.push(<button id = {rooms[k]} 
+        onClick = {(e)=>{
+          joinRoom(e);
+        }}
+        onMouseEnter = {(e)=>{
+          getRoomInfo(e);
+        }} key = {uniqid()}>
+          {rooms[k]}
+      </button>);
+    }
+
+    return list;
+  }
   
   function constructUserList() : JSX.Element[] {
     const list:JSX.Element[] = [];
 
-    console.log(users);
-    
-    list.push(<div>
-      {Object.keys(users).map( (key) => {
-          return <div key = {uniqid()}>
-              <span>{key}</span>
-          </div>;
-        })}
-    </div>);
+    for(let k = 0; k < users.length; k++){
+      list.push(<div key = {uniqid()}>
+          <div >{users[k]}</div>
+      </div>);
+    }
 
     return list;
   }
@@ -282,7 +311,9 @@ const Chessboard: React.FC = (): ReactElement => {
         <div id ="innercontainer">
           {constructedBoard}
         </div>
+        <div id = "roomTitle">Open Rooms:</div>
         <div id = "userlist">{userList}</div>
+        <div id = "roomlist">{roomList}</div>
         {/* <div className= "capturedBlack captured">
           {capturedBlack}
         </div> */}

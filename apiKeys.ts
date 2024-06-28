@@ -1,6 +1,6 @@
 const tryRequire = require("try-require");
 
-var config;
+let config;
 
 if( ((process.env.HEROKU || process.env.AWS) === "true") || (__dirname.indexOf("build")!= -1) ){
     var env = process.env; 

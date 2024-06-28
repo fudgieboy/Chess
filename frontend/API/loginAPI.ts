@@ -12,7 +12,9 @@ const login = (params, callback, fail) => {
 
                 let token = String.fromCharCode.apply(null, res.value);
                 token = JSON.parse(token); 
-
+                
+                console.log(token);
+                 
                 if(response.status == 200){
                     LocalStore.actions.loginUser(token.data.list, token.data.requests, callback, fail);
                 } else if (response.status == 500){
@@ -39,6 +41,8 @@ const addFriend = (params, callback, fail) => {
                 reader.read().then((res)=>{
                     let token = String.fromCharCode.apply(null, res.value);
                     token = JSON.parse(token); 
+                    
+                    console.log(token);
 
                     console.log("login");
                     console.log(token.data.list);

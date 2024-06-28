@@ -1,12 +1,20 @@
-// const connection = (creds) => {
-// 	const mongoose = require("mongoose");
-// 	var dbOptions = { useUnifiedTopology: true, useNewUrlParser: true, keepAlive: 300000, connectTimeoutMS: 30000};
-// 	mongoose.connect( creds , dbOptions);
-// 	mongoose.set("useCreateIndex", true);
-// 	const db = mongoose.connection;
-// 	// l(db);
-// };
+import {config} from "../../apiKeys";
 
-// export {
-// 	connection
-// };
+const connection = (creds) => {
+	console.log("connecting to DB");
+
+	const mongoose = require("mongoose");
+	const dbOptions = { useUnifiedTopology: true, useNewUrlParser: true, keepAlive: 300000, connectTimeoutMS: 30000};
+	mongoose.connect( creds.devUrl , dbOptions);
+	mongoose.set("useCreateIndex", true);
+	const db = mongoose.connection;
+	// l(db);
+};
+
+connection(config.dbCreds);
+
+export {
+	connection
+};
+
+//TODO: reconnect DB to CHESS table

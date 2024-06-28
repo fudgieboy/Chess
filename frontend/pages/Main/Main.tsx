@@ -1,8 +1,8 @@
 import React, {ReactElement, Component, useEffect, useState} from "react";
 import { Route, Routes } from 'react-router-dom';
 import Chessboard from "../../globalComponents/Chessboard"; 
-import Login from "../../globalComponents/partials/login";
-import Register from "../../globalComponents/partials/register";
+import Login from "../../globalComponents/Login";
+import Register from "../../globalComponents/Register";
 import LocalStore from "../../stores/LocalStore";
 
 const Main: React.FC = () : ReactElement => {
@@ -102,12 +102,12 @@ const Main: React.FC = () : ReactElement => {
             {/* </Routes> */}
           </div>
           <Chessboard />
-          {/* <div id = "loginFormsContainer">
+           <div id = "loginFormsContainer">
             <div className = {loginInnerContainerClasses} >
               {!unmountLoginForms ? <Register hideSelf = {hideLoginForms} showSelf = {revealLoginForms} /> :null}
               {!unmountLoginForms ? <Login  hideSelf = {hideLoginForms} showSelf = {revealLoginForms}/> :null}
             </div>
-          </div>  */}
+          </div> 
       </div>
     // </Router>
   );

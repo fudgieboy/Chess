@@ -159,7 +159,7 @@ module.exports = {
       stats: {
           // assets: true,
           children: false,
-          // chunks: true,
+          chunks: true,
           // chunkModules: true,
           // colors: true,
           entrypoints: true,
@@ -174,6 +174,11 @@ module.exports = {
           // logging: true,
           // loggingDetails: true,
       }
+    },
+    performance: {
+      hints: false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000
     },
     optimization:{
       runtimeChunk:{

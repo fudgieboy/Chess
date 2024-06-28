@@ -83,6 +83,25 @@ button, input[type=submit], input[type=file]::file-selector-button{
     z-index: 10;
     font-size: 2em;
 }
+
+#roomTitle{
+    position: absolute;
+    height: 100%;
+    top: -1em;
+    width: 100%;
+    left: 100%;
+    z-index: 10;
+    font-size: 2em;
+}
+
+#roomlist{
+    position: absolute;
+    height: 100%;
+    top: 0%;
+    left: 100%;
+    z-index: 10;
+    font-size: 2em;
+}
 // .inputfile{
 //     float: right;
 // }

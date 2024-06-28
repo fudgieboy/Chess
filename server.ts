@@ -6,21 +6,19 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import * as jwtHelper from "./backend/utils/jwtHelper";
-import utils from "./backend/utils/misc";
+import {l, n} from "./backend/utils/misc";
 import ejs from "ejs";
-import Gamelogic from './shared/gamelogic';
 import {createServer} from 'http';
 import {v4} from 'uuid';
-import {WebSocketServer} from 'ws';
-//import {connection} from "./backend/dataAccess/dbConnection";
+import {initiateWss} from "./backend/sockets/socketConnection";
+// import { initiateLogger } from "./backend/logging/logManager";
+import { RoomManager as RoomManager2} from "./backend/rooms/roomManager";
 const uniqid = require("uniqid");
 
-//import listRoutes from "./backend/list/listRoutes";
-//import userRoutes from "./backend/users/userRoutes";
+import {connection} from "./backend/dataAccess/dbConnection";
+import listRoutes from "./backend/list/listRoutes";
+import userRoutes from "./backend/users/userRoutes";
 
-const {n} = utils;
-
-const winston = require('winston');
 const port = 8080;
 
 const WSPORT = 8081;
@@ -28,33 +26,11 @@ const WSPORT = 8081;
 console.log(`***WS port on ${WSPORT + 1}`);
 console.log(`***WS port is ${typeof(WSPORT)}`);
 
-type userString = string;
-type roomString = string;
-
-const logConfiguration = {
-  'transports': [
-      new winston.transports.Console(),
-      new winston.transports.File({
-        filename: 'logs/mainLog.txt'
-      })
-  ]
-};
-
-const slogConfiguration = {
-  'transports': [
-      new winston.transports.Console(),
-      new winston.transports.File({
-        filename: 'logs/socketMessages.txt'
-      })
-  ]
-};
-
-const slogger = winston.createLogger(slogConfiguration);
-const logger = winston.createLogger(logConfiguration);
-
 const app = express();
 const server = createServer();
-const wss = new WebSocketServer({ port: WSPORT });
+const wss = initiateWss();
+
+connection(config.dbCreds);
 
 require("@babel/register")({extensions: [".js", ".ts"]});
 
@@ -62,7 +38,6 @@ const curEnv = config.curEnv;
 const dev = (curEnv === "development");
 require("pretty-error").start();
 
-//connection(config.dbCreds);
 
 app.use(cookieParser(config.cookieSecret, { httpOnly: true })); 
 app.use(morgan("dev"));
@@ -81,7 +56,6 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   } 
   
-  // res.header("Content-Type", "text/javascript");
   next();
 }); 
 
@@ -96,6 +70,7 @@ app.use(function(req, res, next) {
   next();
 });
 
+
 let dirPrefix = "build/";
 if(curEnv == "production"){
   dirPrefix = "";
@@ -105,6 +80,7 @@ app.get("/", (req,res) => {
 
   // const message = {header: req.header, body: req.body, query: req.query, cookies: req.cookies, userToken: req.userToken, curEnv: curEnv, ip: req.socket.remoteAddress};
 
+  //call the logger manager and make it do this instead
   // logger.log({
   //   message: message,
   //   level: 'info'
@@ -115,9 +91,8 @@ app.get("/", (req,res) => {
   });
 }); 
  
-
-//app.use(listRoutes);
-//app.use(userRoutes);
+app.use(listRoutes);
+app.use(userRoutes);
 
 console.log("starting app...");
 
@@ -146,195 +121,25 @@ const updateAllExcept = (ws, action) => {
   });
 };
 
-const resendUserList = () => {
-  wss.clients.forEach( (client) => {
-    client.send(JSON.stringify({command: "addUser", users: userIDs}));
+const roomManager = new RoomManager2();
+
+const updateLocalLists = () => {
+  resendPlayerList();
+  resendRoomList();
+};
+
+const resendRoomList = () => {
+  wss.clients.forEach( (ws) => {
+    ws.send(JSON.stringify({command: "updateRoomList", rooms: roomManager.getAllRoomIds()}));
   });
 };
 
-// class PlayerManager{
+const resendPlayerList = () => {
 
-// }
-
-
-class Room{
-  constructor(userID:userString){
-    this.ownerID = userID;
-    this.gameID = uniqid();
-    this.players = [];
-    this.players.push(userID);
-    this.spectators = [];
-    this.game = Gamelogic();
-  }
-
-  addPlayer = (playerID) => {
-    this.players.push(playerID);
-  }
-
-  addSpectator = (playerID) => {
-    this.spectators.push(playerID);
-  }
-
-
-  //check if remaining player is not owner. if not owner set owner to someone else
-  removePlayer = (playerID) => {
-    for(let i = 0; i < this.players.length;i++){
-      if(this.players[i] == playerID){
-        this.players.splice(i, 1);
-      }
-    }
-  }
-
-  removeSpectator = (playerID) => {
-    for(let i = 0; i < this.spectators.length;i++){
-      if(this.spectators[i] == playerID){
-        this.spectators.splice(i, 1);
-      }
-    }
-  }
-
-  getBasicBoard = () => {
-    return this.game.getBasicBoard();
-  }
-
-  getConstructedGrid = () => {
-    return this.game.getConstructedGrid();
-  }
-
-  getValidMoves = (location) => {
-    return this.game.getValidMoves(location, (val, newMoves)=>{
-
-      newMoves.push(val);
-      return newMoves;
-    }, {noStop: false, pinCheck: true});
-  }
-
-  movePiece = (moveData) => {
-    return this.game.movePiece(moveData);
-  }
-
-  resetGame = () => {
-    this.game.resetGame();
-  }
-
-  getGameID = () :roomString => {
-    return this.gameID;
-  }
-
-  getOwnerID = () :userString => {
-    return this.gameID;
-  }
-
-  ownerID:userString;
-  gameID:roomString;
-  players = [];
-  spectators = [];
-  game = null; 
-}
-class RoomManager{
-  constructor(){
-    this.rooms = {};  
-  }
-
-  findAvailableMatch = (userID:userString):roomString =>{
-    let room = this.searchRooms(userID);
-    
-    if(room == null){
-      this.addUserAsSpectator(room, userID);
-    } else {
-      this.addUserToRoom(room, userID);
-    } 
-    return room.getGameID();
-  }
-
-
-  searchRooms = (userID) => {
-    for (const roomID in this.rooms) {
-      const room = this.rooms[roomID];
-
-      if (room.players.length < 2) {
-       return room;
-      }
-    }
-    return null;
-  }
-
-  removeUserFromRoom = (roomID:roomString, userID:userString) => {
-    const room = this.rooms[roomID];
-
-    if (room) {
-      room.removePlayer(userID);
-    }
-
-    //should call destroy room function
-    if(room.players.length == 0){
-      delete this.rooms[roomID];
-      this.numRooms = this.numRooms-1;
-    }
-    //check if room is empty. if so, delete the room
-  }
-
-  addUserToRoom = (room, userID:userString) => {
-    if (room) {
-      if (room.players.length < 2) {
-        room.addPlayer(userID);
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  addUserAsSpectator = (roomID:roomString, userID:userString):boolean => {
-    const room = this.rooms[roomID];
-    if (room) {
-      room.addSpectator(userID);
-      return true;
-    } else {
-      return false;
-    }
-  }
-  
-  movePiece = (roomID, userID, moveData) => {
-    return {result: this.rooms[roomID].movePiece(moveData), users: this.rooms[roomID].players};
-  };
-
-  getValidMoves = (roomID, userID, location) => {
-    return this.rooms[roomID].getValidMoves(location);
-  };
-
-  getConstructedGrid = (roomID, userID) => {
-
-  };
-
-  getBasicBoard = (roomID, userID) => {
-    return this.rooms[roomID].getBasicBoard();
-  };
-
-  createRoom = (playerID) => {
-    let pid;
-  
-    if(pid == undefined || pid == null){
-      pid = playerID;
-    } else {
-      pid = null;
-    }
-    
-    const room = new Room( pid );
-
-    this.rooms[room.getGameID()] = room;
-    this.numRooms = this.numRooms+1;
-
-    return room.getGameID();
-  };
-
-  rooms = {};
-  numRooms = 0;
-}
-
-const roomManager = new RoomManager();
+  wss.clients.forEach( (ws) => {
+    ws.send(JSON.stringify({command: "addUser", users: ws['room'].getPlayers()}));
+  }); 
+};
 
 wss.on('connection', function connection(ws) {
   let newID = uniqid();
@@ -343,7 +148,6 @@ wss.on('connection', function connection(ws) {
   userIDs[newID] = newID;
 
   numPlayers = numPlayers+1;
-  resendUserList();
 
 
   if(numPlayers % 2 == 1){
@@ -351,45 +155,54 @@ wss.on('connection', function connection(ws) {
 
   } else { 
     ws['room'] = roomManager.findAvailableMatch(newID);
-
   } 
    
+  updateLocalLists();
+  
   ws.binaryType = 'arraybuffer';
   ws.send(JSON.stringify({command: "initUser", newUserID: v4()}));
 
   ws.onclose = () => {
     setTimeout(() => {
         ws.terminate();
-        console.log("disconnecting user " + ws['userid']);
     }, 500);
       
     const curSize = wss.clients.size;
     if(curSize < 2){
       console.log("game reset");
-      // gamelogic.resetGame();
       ws.send(JSON.stringify({command: "resetGame"}));
     }
     
-    roomManager.removeUserFromRoom(ws['room'], ws['userid']);
+    
+    console.log("disconnect user from room " + ws['room'].getRoomID());
+    roomManager.removeUserFromRoom(ws['userid'], ws['room'].getRoomID());
     userIDs[ ws['userid']] = null;
     delete userIDs[ ws['userid']];
     numPlayers = numPlayers-1;
-    resendUserList(); 
+    updateLocalLists(); 
   };
-
-
-  
 
   ws.on('message', function message(data) {
 
     const inputCommands = JSON.parse(data.toString());
 
+    if(inputCommands.command == "getRequestedRoomInfo"){
+      //TODO: return players in room here, when mouse hovers
+    }
+
+    if(inputCommands.command == "joinRoom"){
+      //get the player id and move him to the new room via room manager
+      console.log("join room");
+      roomManager.moveUserToRoom(ws['room'].getRoomID(), ws['userid'], inputCommands.targetRoomID);
+      ws.send(JSON.stringify({command: "returnInitialState", newBoard: roomManager.getBasicBoard(ws['room'].getRoomID(), ws['userid'])}));
+    }
+
     if(inputCommands.command == "getInitialState"){
-      ws.send(JSON.stringify({command: "returnInitialState", newBoard: roomManager.getBasicBoard(ws['room'], ws['userid'])}));
+      ws.send(JSON.stringify({command: "returnInitialState", newBoard: roomManager.getBasicBoard(ws['room'].getRoomID(), ws['userid'])}));
     }
 
     if(inputCommands.command == "getValidMoves"){
-      const moves = roomManager.getValidMoves( ws['room'], ws['userid'], inputCommands.location);
+      const moves = roomManager.getValidMoves( ws['room'].getRoomID(), ws['userid'], inputCommands.location);
       ws.send(JSON.stringify({command: "receiveMoves", movelist: moves}));
     }
     
@@ -401,7 +214,7 @@ wss.on('connection', function connection(ws) {
               moveTime: moveTime
       };
       
-      const move = roomManager.movePiece(ws['room'], ws['userid'], moveData);
+      const move = roomManager.movePiece(ws['room'].getRoomID(), ws['userid'], moveData);
       const gameResponse = move.result;
       const users = move.users;
 
@@ -409,7 +222,11 @@ wss.on('connection', function connection(ws) {
         // authoritatively respond with newboard
         ws.send(JSON.stringify({command: "finishMove", completeTime: new Date(), moveID: v4(), newBoard: gameResponse.newBoard, location: inputCommands.location, target: inputCommands.target}));
         
-        updateAllInRoom(ws, users, JSON.stringify({command: "finishForeignMove", newBoard: gameResponse.newBoard, completeTime: new Date(), moveID: v4(), location: inputCommands.location, target: inputCommands.target}));
+        
+        updateAllInRoom(ws, 
+          users, 
+          JSON.stringify({command: "finishForeignMove", newBoard: gameResponse.newBoard, completeTime: new Date(), moveID: v4(), location: inputCommands.location, target: inputCommands.target}));
+
       } else {
         //error in moving piece 
         // ws.send(JSON.stringify({command: "finishMove", completeTime: new Date(), moveID: v4(), location: inputCommands.location, target: inputCommands.target}));
@@ -419,7 +236,6 @@ wss.on('connection', function connection(ws) {
         //     client.send(JSON.stringify({command: "finishForeignMove", location: inputCommands.location, target: inputCommands.target}));
         //   }
         // }); {
-
       }
     }
   });
