@@ -57,10 +57,10 @@ $mainColor: black;
 button, input[type=submit], input[type=file]::file-selector-button{
     border-radius: 1em;
     padding: $smallMargin;
-    text-transform: uppercase;
     color: $white;
     background-color: $mainColor;
     border: 0px;
+    box-sizing: border-box;
 }
 
 // input[type=file]::file-selector-button:hover {
@@ -95,13 +95,46 @@ button, input[type=submit], input[type=file]::file-selector-button{
 }
 
 #roomlist{
-    position: absolute;
-    height: 100%;
-    top: 0%;
-    left: 100%;
+    position: relative;
+    float: left;
     z-index: 10;
     font-size: 2em;
+    width: 120px;
+    overflow: hidden;
+    height: 100%;
 }
+
+#roomdatacontainer{
+  position: absolute;
+  height: 100%;
+  top: 0%;
+  left: 100%;
+  width: 300px;
+}
+
+#roominfo{
+    position: relative;
+    width: 160px;
+    float: left;
+    height: auto;
+    border-radius: 1em;
+    padding: $smallMargin;
+    color: $white;
+    background-color: $mainColor;
+    flex-wrap: wrap;
+    white-space: nowrap;
+}
+
+.roombutton{
+    text-overflow: ellipsis;
+    width: auto;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    display: inline-block;
+}
+
 // .inputfile{
 //     float: right;
 // }
@@ -268,14 +301,9 @@ input[type=number] {
     }
 
 .glow{
-    background-color: lighten(blue, 40%) !important;
-    // border: 1px solid lighten(blue, 30%);
-    box-sizing: border-box;
-}
-
-.moveglow{
-    background-color: lighten(blue, 45%) !important;
-    // border: 1px solid lighten(blue, 30%);
+    background-color: lighten(rgb(255, 255, 255), 40%) !important;
+    color: black !important;
+    border: 1px solid black;
     box-sizing: border-box;
 }
 

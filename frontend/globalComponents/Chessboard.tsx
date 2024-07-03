@@ -1,6 +1,7 @@
 import React, { ReactElement, useState, useEffect} from "react";
 import { v4 } from "uuid";
 import Chesspiece from "./Pieces/Piece";
+import Roomlist from "./Roomlist";
 // import TodoListStore from "../stores/TodoListStore";
 // import LocalStore from "../stores/LocalStore";
 // import {getPieceFromType, PB} from "./Pieces/PieceTypes";
@@ -12,7 +13,7 @@ let WSHOST = window.location.host.split(":");
 WSHOST = "ws://" + WSHOST[0] + ":" + "8081";
 
 if(global.env !== "development") { 
-  socket = new WebSocket(WSHOST, "protocolOne");
+  socket = new WebSocket( WSHOST, "protocolOne");
 } else {
   socket = new WebSocket('ws://localhost:8081', "protocolOne");
 }
@@ -31,8 +32,6 @@ enum orientation {
 
 const gamelogic = Gamelogic();
 
-let users = [];
-let rooms = [];
 
 let initialPositions: Array<string[]> = [ 
   ["rook black", "knight black", "bishop black", "queen black", "king black", "bishop black", "knight black", "rook black"],
@@ -46,7 +45,6 @@ let initialPositions: Array<string[]> = [
 ];
 
 const Chessboard: React.FC = (): ReactElement => {
-
   const [delayedEvents, setDelayedEvents] = useState([]);
 
 //pass a move uuid from the backend and a time.
@@ -61,7 +59,12 @@ const Chessboard: React.FC = (): ReactElement => {
 
     clearInterval(intervalID);
   }, 50); //this is a hack to get the board to update when the store changes. I need to find a better way to do this
-  
+
+
+  // useEffect(() => {
+  //   LocalStore.store.on("update_login_status", updateLoginFolders); 
+  // }, []);
+    
   useEffect(() => {
     socket.onmessage = (event) => {
       let data;
@@ -82,11 +85,10 @@ const Chessboard: React.FC = (): ReactElement => {
         finishForeignMove( inputCommands.location, inputCommands.target, inputCommands.moveID, inputCommands.newBoard);
       } else if (inputCommands && inputCommands.command == "finishMove") {
         setDelayedEvents([...delayedEvents, inputCommands] ); 
+      } else if (inputCommands && inputCommands.command == "receiveRoomInfo") {
+        // setFocusedRoom(inputCommands.roomName);
       } else if (inputCommands && inputCommands.command == "updateRoomList") {
-        rooms = inputCommands.rooms;
-        setRoomList(constructRoomList());
-      } else if (inputCommands && inputCommands.command == "addRoom") {
-      } else if (inputCommands && inputCommands.command == "removeRoom") {
+        setRooms(inputCommands.rooms);
       } else if (inputCommands && inputCommands.command == "addUser") {
         users = inputCommands.users;
         setUserList(constructUserList());
@@ -107,42 +109,39 @@ const Chessboard: React.FC = (): ReactElement => {
   let highlightActive = false;
   
   let moveList = [];
+  let users = [];
+
+  const [rooms, setRooms] = useState<string[]>([]);
 
   const [userList, setUserList] = useState<JSX.Element[]>(
     constructUserList()
   );
   
-  const [roomList, setRoomList] = useState<JSX.Element[]>(
-    constructRoomList()
-  );
+  const joinRoom = (index) => {
+    console.log(index);
+    // const content = {command: "joinRoom", targetRoomID: e.currentTarget.id};
+    // socket.send(JSON.stringify(content));
+  };
+
+  const getRoomInfo = (index)=>{
+    // const content = {command: "getRequestedRoomInfo", targetRoomID: id};
+    // socket.send(JSON.stringify(content));
+  };
   
-  function joinRoom(e){
-    const content = {command: "joinRoom", targetRoomID: e.currentTarget.id};
-    socket.send(JSON.stringify(content));
-  }
 
-  function getRoomInfo(e){
-    const content = {command: "getRequestedRoomInfo", targetRoomID: e.currentTarget.id};
-    socket.send(JSON.stringify(content));
-  }
-  
-  function constructRoomList() : JSX.Element[] {
-    const list:JSX.Element[] = [];
+  const updateRoomName = (newVal, index) => {
+  // console.log(newVal, index);
+    // const newRooms = [];
+    // for(let i = 0; i < rooms.length; i ++){ 
+    //   if(i == index){
+    //     newRooms.push(newVal);
+    //   } else {
+    //     newRooms.push(rooms[i]);
+    //   }
+    // }
 
-    for(let k = 0; k < rooms.length; k++){
-      list.push(<button id = {rooms[k]} 
-        onClick = {(e)=>{
-          joinRoom(e);
-        }}
-        onMouseEnter = {(e)=>{
-          getRoomInfo(e);
-        }} key = {uniqid()}>
-          {rooms[k]}
-      </button>);
-    }
-
-    return list;
-  }
+    // setRooms(newRooms);
+  };
   
   function constructUserList() : JSX.Element[] {
     const list:JSX.Element[] = [];
@@ -280,15 +279,15 @@ const Chessboard: React.FC = (): ReactElement => {
     // });
   }
 
-  const clearHighlightedSquares = () => {
-    for(let i = 0; i < GRIDWIDTH; i ++){
-      for(let k = 0; k < GRIDWIDTH; k ++){
-        const el = document.getElementById( i + " " + k );
-        el.classList.remove("moveglow");
+  // const clearHighlightedSquares = () => {
+  //   for(let i = 0; i < GRIDWIDTH; i ++){
+  //     for(let k = 0; k < GRIDWIDTH; k ++){
+  //       const el = document.getElementById( i + " " + k );
+  //       el.classList.remove("moveglow");
           
-      }
-    }
-  };
+  //     }
+  //   }
+  // };
 
   // const getPieceFromCoords( org: {x: number, y: number} ){
   //   const piece = initialPositions[org.y][org.x];
@@ -303,6 +302,7 @@ const Chessboard: React.FC = (): ReactElement => {
     socket.send(JSON.stringify(content));
   };
 
+
   return (
     <div id = "board">
         {/* <div className= "capturedWhite captured">
@@ -313,7 +313,12 @@ const Chessboard: React.FC = (): ReactElement => {
         </div>
         <div id = "roomTitle">Open Rooms:</div>
         <div id = "userlist">{userList}</div>
-        <div id = "roomlist">{roomList}</div>
+        <Roomlist rooms = {rooms} 
+          joinRoom = {joinRoom}
+          getRoomInfo = {getRoomInfo}
+          updateRoomName = {updateRoomName}
+        />
+
         {/* <div className= "capturedBlack captured">
           {capturedBlack}
         </div> */}

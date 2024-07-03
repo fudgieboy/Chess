@@ -1,8 +1,11 @@
 const uniqid = require("uniqid");
 import Gamelogic from '../../shared/gamelogic';
+import Player from "../players/player";
 
 //remove gamelogic and socket connections from main server file
 
+//TODO: add room renaming
+//TODO: display all players in room next to room
 //TODO: this is in two places
 //TODO: return user only users in room
 //TODO: add spectator option
@@ -13,7 +16,8 @@ import Gamelogic from '../../shared/gamelogic';
 //TODO: allow room owner to kick players
 //TODO :enable inviting of players
 //TODO: add friendlist support
-
+//TODO: add basic chat
+//TODO: keep track ofusers that joined and left game so they can't rejoin the same game unless invited
 type userString = string;
 type roomString = string;
 
@@ -92,7 +96,14 @@ class Room{
   }
 
   getOwnerID = () :userString => {
-    return this.gameID;
+    return this.ownerID;
+  }
+
+  setName = (newName) => {
+    this.name = newName;
+  }
+  setOwnerID = (newID) => {
+    this.ownerID = newID;
   }
 
   getAllOccupants = () => {};
@@ -114,6 +125,7 @@ class Room{
   public = true;
   membersOnly = false;
   ranked = false;
+  name = "";
 }
 class RoomManager{
   //TODO: periodically check for empty rooms and delete them
@@ -227,6 +239,12 @@ class RoomManager{
       roomIDs.push(this.rooms[i].getRoomID());
     }
     return roomIDs;
+  }
+
+  renameRoom = (targetRoom, userID, newName) => {
+    if(this.rooms[targetRoom].getOwnerID() == userID){
+      this.rooms[targetRoom].setName(newName);
+    }
   }
 
   createRoom = (playerID) => {
