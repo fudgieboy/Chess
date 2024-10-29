@@ -88,7 +88,7 @@ const Chessboard: React.FC = (): ReactElement => {
       } else if (inputCommands && inputCommands.command == "receiveRoomInfo") {
         // setFocusedRoom(inputCommands.roomName);
       } else if (inputCommands && inputCommands.command == "updateRoomList") {
-        setRooms(inputCommands.rooms);
+        setRooms( constructNewList(inputCommands.rooms));
       } else if (inputCommands && inputCommands.command == "addUser") {
         users = inputCommands.users;
         setUserList(constructUserList());
@@ -98,6 +98,16 @@ const Chessboard: React.FC = (): ReactElement => {
       }
     };
   }, []); //only run this on mount and unmount, not every render
+
+  function constructNewList (incomingList): string[] {
+    const newList = [];
+    for(let i = 0; i  < incomingList.length ; i++){
+      newList.push(incomingList[i]);
+    }
+    return newList;
+  }
+
+
 
   const whiteInCheck= false;
   const blackInCheck= false;
@@ -129,8 +139,13 @@ const Chessboard: React.FC = (): ReactElement => {
   };
   
 
-  const updateRoomName = (newVal, index) => {
-  // console.log(newVal, index);
+  const updateRoomName = (index, newVal) => {
+    const content = {command: "renameRoom", targetRoom: index,
+      userID: "Q34352532%#%@#",
+      newName: newVal
+    };
+    socket.send(JSON.stringify(content));
+
     // const newRooms = [];
     // for(let i = 0; i < rooms.length; i ++){ 
     //   if(i == index){
@@ -304,24 +319,28 @@ const Chessboard: React.FC = (): ReactElement => {
 
 
   return (
-    <div id = "board">
-        {/* <div className= "capturedWhite captured">
-          {capturedWhite}
-        </div> */}
-        <div id ="innercontainer">
-          {constructedBoard}
-        </div>
-        <div id = "roomTitle">Open Rooms:</div>
-        <div id = "userlist">{userList}</div>
-        <Roomlist rooms = {rooms} 
-          joinRoom = {joinRoom}
-          getRoomInfo = {getRoomInfo}
-          updateRoomName = {updateRoomName}
-        />
-
-        {/* <div className= "capturedBlack captured">
-          {capturedBlack}
-        </div> */}
+    <div id = "boardContainer">
+      <div id = "board">
+          {/* <div className= "capturedWhite captured">
+            {capturedWhite}
+          </div> */}
+          <div id ="innercontainer">
+            {constructedBoard}
+          </div>
+          
+          <div id = "userlist">{userList}</div>
+          <div id = "roomcontainer">
+            <div id = "roomtitle">Open Rooms:</div>
+            <Roomlist rooms = {rooms} 
+              joinRoom = {joinRoom}
+              getRoomInfo = {getRoomInfo}
+              updateRoomName = {updateRoomName}
+            />
+          </div>
+          {/* <div className= "capturedBlack captured">
+            {capturedBlack}
+          </div> */}
+      </div>
     </div>
   );
 };

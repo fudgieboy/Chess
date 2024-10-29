@@ -189,16 +189,18 @@ wss.on('connection', function connection(ws) {
     }
 
     if(inputCommands.command == "joinRoom"){
-      //get the player id and move him to the new room via room manager
-      console.log("join room" + inputCommands.targetRoomID);
       roomManager.moveUserToRoom(ws['room'].getRoomID(), ws['userid'], inputCommands.targetRoomID);
       ws.send(JSON.stringify({command: "returnInitialState", newBoard: roomManager.getBasicBoard(ws['room'].getRoomID(), ws['userid'])}));
     }
 
-    if(inputCommands.command == "renameRoom "){
-      //get the player id and move him to the new room via room manager
-      roomManager.renameRoom(ws['room'].getRoomID(), ws['userid'], inputCommands.roomName);
-      console.log(inputCommands.roomName);
+    if(inputCommands.command == "renameRoom"){
+      roomManager.renameRoom(ws['room'].getRoomID(), inputCommands.userID, inputCommands.newName, (success)=>{
+        if(success){
+          updateLocalLists();
+        } else {
+          console.log("rename failed");
+        }
+      });
       updateLocalLists();
     }
 

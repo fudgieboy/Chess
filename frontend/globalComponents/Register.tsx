@@ -29,6 +29,7 @@ export default function Register(){
   return ( 
     <div id = "registerModal">
       <form onSubmit={register}>
+        Register:
         <input onChange = {(ev)=> updateUsername(ev.target.value)} placeholder = "Username"></input>
         <input onChange = {(ev)=> updatePassword(ev.target.value)} placeholder = "Password"></input>
         <input onChange = {(ev)=> updateEmail(ev.target.value)} placeholder = "EmailAddress"></input>

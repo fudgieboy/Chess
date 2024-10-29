@@ -3,7 +3,7 @@ const tryRequire = require("try-require");
 let config;
 
 if( ((process.env.HEROKU || process.env.AWS) === "true") || (__dirname.indexOf("build")!= -1) ){
-    var env = process.env; 
+    const env = process.env; 
     config = {
         cookieSecret: env.COOKIE_SECRET,
         curEnv: "production",

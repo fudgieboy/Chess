@@ -39,7 +39,6 @@ const Roomlist: React.FC<RoomlistProps> = (props:RoomlistProps): ReactElement =>
         index = {k}
       />);
     }
-
     return list;
   }
 
@@ -47,12 +46,13 @@ const Roomlist: React.FC<RoomlistProps> = (props:RoomlistProps): ReactElement =>
     setRoomList(constructRoomList());
   }, [rooms]);
 
-  const [focusedRoom, setFocusedRoom] = useState<string>("test");
-   
+  // const test = "remove player list from beneath board add it to room info when mouse hovers over room info give option to join room";   
+  const test = "";   
+  const [focusedRoom, setFocusedRoom] = useState<string>(test);
   return (
       <div id = "roomdatacontainer">
         <div id = "roomlist">{roomList}</div>
-        <div id = "roominfo">{focusedRoom}</div>
+        <div id = "roominfo"  className = "anim">{focusedRoom}</div>
       </div>
   );
 };

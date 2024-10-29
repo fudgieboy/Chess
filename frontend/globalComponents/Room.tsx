@@ -19,7 +19,7 @@ const Room: React.FC<IRoom> = (props: IRoom): ReactElement => {
 
   return(
     <li id = { props.index + ""} className = "subContainer" >
-          <input className = "button folderButton" onChange = {(ev)=>{updateRoomName(ev.target.value)}} type = "text" value ={name}/>
+          <input className = "button roomname" onChange = {(ev)=>{updateRoomName(ev.target.value);}} type = "text" value ={props.name}/>
     </li>
   );
 };

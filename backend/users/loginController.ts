@@ -28,7 +28,9 @@ const loginController = () =>{
                   ListData.getListbyUserId(resUser.memberID, (getListError, resList)=>{ 
                     if(n(getListError)){
                       const token = helper.getLoginToken(loginUser.username);
-                      const expiryTime = Date.now() + (dev?36000:3600000); 
+                      const expiryTime = Date.now() + (dev?36000:3600000); //30 seconds if in dev mode
+
+                      //TODO: store user in logged in redis cache
                       
                       res.cookie("expiryTime", 
                         expiryTime, 

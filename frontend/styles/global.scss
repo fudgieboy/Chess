@@ -17,17 +17,27 @@ $headerHeight: 60px;
 $commonMargin: 16px;
 $smallMargin: 5px;
 
-$mainColor: black;
+$mainDarker: rgb(255, 243, 225);
+$mainColor: rgb(232, 217, 194);
+$secondaryColor: rgb(116, 165, 255);
 
 #header {
+    background-color: $mainColor;
+
     $headerPadding: 6.5%;
     padding-left: $headerPadding;
     padding-right: $headerPadding;
     box-sizing: border-box;
+    width: 100vw;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: $headerHeight;
+    z-index: 4;
 
     h1 {
         // margin-left: ;
-        color: white;
+        color: $secondaryColor;
         width: auto;
         float: left;
     }
@@ -43,86 +53,189 @@ $mainColor: black;
         margin-right: 5px;
     }
     button{
-        color: white;
+        color: $secondaryColor;
     }
+
+    a{
+        color: $secondaryColor;
+        text-decoration: none;
+    }
+}
+
+#leftBar{
+    background-color: $mainColor;
+    color: $black;
+    
+    width: 200px;
+    position: relative;
+    display: block;
+    position: absolute;
+    top: 0px;
+    z-index: 3;
+    padding-top: 100px;
+    height: 100%;
+    box-sizing: border-box;
+
+    ul{
+        margin-top: 50px;
+        list-style: none;
+        li{
+            border-bottom: 1px solid $secondaryColor;
+        }
+    }
+}
+
+#leftBar a:hover{
+    color: $secondaryColor;
+}
+
+#loginFormsContainer{
+    background-color: $mainColor;
+    color: $secondaryColor;
+
+    overflow: hidden;
+    box-sizing: border-box;
+    height: 100%;
+    width: 200px;
+    position: absolute;
+    right: 0px;
+    z-index: 10;
+    padding: 10px;
+    box-sizing: border-box;
+
+    -webkit-transition: all .5s; 
+       -moz-transition: all .5s;
+         -o-transition: all .5s;
+            transition: all .5s;  
 }
 
 #main{
     width: 100%;
-    height: 100%;
+    height: 100vh;
     margin: auto;
     position: relative;
+    background-color: $mainDarker;
+}
+
+
+#roomlist{
+    position: relative;
+}
+
+#roominfo{
+    border-left: 3px solid $black;
+    border-top: 3px solid $black;
+    color: $secondaryColor;
+
+    padding: 1px;
+    padding-left: $smallMargin;
+    width: 12px;
+    float: left;
+    height: 1em;
+    border-radius: 1em;
+    flex-wrap: wrap;
+    white-space: nowrap;
+}
+
+#roomlist li{
+    position: relative;
+}
+
+.roomname{
+    border: 0px;
+    background-color: $mainDarker;
+}
+
+#roominfo:hover{
+    width:100px;
+    color: $white;
+    background-color: $black;
+    border-color: $secondaryColor;
+}
+
+.anim{
+    -webkit-transition: all .5s; 
+       -moz-transition: all .5s;
+         -o-transition: all .5s;
+            transition: all .5s;  
+  }
+
+.anim2{
+    -webkit-transition: all .25s; 
+        -moz-transition: all .25s;
+        -o-transition: all .25s;
+            transition: all .25s;  
 }
 
 button, input[type=submit], input[type=file]::file-selector-button{
     border-radius: 1em;
     padding: $smallMargin;
-    color: $white;
     background-color: $mainColor;
     border: 0px;
     box-sizing: border-box;
+    color: darken($secondaryColor, 20%);
 }
 
+input{
+    border: 0px;
+}
 // input[type=file]::file-selector-button:hover {
 // }
 
-
-
-#clearImage, #uploadImage{
-    // visibility: hidden;
-}
 
 #imageFiles{
     width: 75px;    
 }
 
+#roomlist input{
+    color: $secondaryColor;
+}
+
+#roomcontainer{
+    color: $secondaryColor;
+}
+
 #userlist{
     position: absolute;
-    height: 100%;
     top: 100%;
+    z-index: 10;
+    font-size: 2em;
+    color: $secondaryColor;
+}
+
+#roomtitle{
+    position: relative;
+    height: 100%;
+    top: 0em;
+    width: 100%;
     z-index: 10;
     font-size: 2em;
 }
 
-#roomTitle{
+#roomcontainer{
     position: absolute;
-    height: 100%;
-    top: -1em;
+    top: 0%;
     width: 100%;
     left: 100%;
     z-index: 10;
-    font-size: 2em;
 }
 
 #roomlist{
     position: relative;
     float: left;
     z-index: 10;
-    font-size: 2em;
+    // font-size: 2em;
     width: 120px;
     overflow: hidden;
     height: 100%;
 }
 
 #roomdatacontainer{
-  position: absolute;
+  position: relative;
   height: 100%;
-  top: 0%;
-  left: 100%;
+  top: 1em;
+//   left: 100%;
   width: 300px;
-}
-
-#roominfo{
-    position: relative;
-    width: 160px;
-    float: left;
-    height: auto;
-    border-radius: 1em;
-    padding: $smallMargin;
-    color: $white;
-    background-color: $mainColor;
-    flex-wrap: wrap;
-    white-space: nowrap;
 }
 
 .roombutton{
@@ -145,11 +258,6 @@ button, input[type=submit], input[type=file]::file-selector-button{
 
 .clearall{
     float: right;
-}
-
-#header a{
-    color: white;
-    text-decoration: none;
 }
 
 #mdiv {
@@ -202,15 +310,6 @@ button, input[type=submit], input[type=file]::file-selector-button{
     }
 }
 
-#header{
-    width: 100vw;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    height: $headerHeight;
-    background-color: $mainColor;
-}
-
 .postItem{
     width: 100%;
     margin-bottom: $smallMargin;
@@ -251,17 +350,6 @@ button, input[type=submit], input[type=file]::file-selector-button{
 
 .anim{
   transition: all ease-in-out 1s;
-}
-
-#loginFormsContainer{
-    overflow: hidden;
-    box-sizing: border-box;
-    height: auto;
-    height: 100%;
-    width: 200px;
-    position: absolute;
-    right: 0px;
-    background-color: black;
 }
 
 .galleryContainer{
@@ -319,6 +407,10 @@ input[type=number] {
     right: 0px;
 }
 
+li {
+    display:block;
+}
+
 .capturedWhite .capturedBlack{
     width: 12.5%;
     height: 200px;
@@ -352,25 +444,57 @@ input[type=number] {
     }
 }
 
-#leftBar{
-    width: 200px;
-    height: 100%;
+/* Tooltip container */
+.tooltip {
     position: relative;
-    display: block;
-    background-color: $mainColor;
-    position: absolute;
-    top: 0px;
-    z-index: -1;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
-#leftBar{
-    padding-top: 100px;
-    color: white;
-    ul{
-        margin-top: 50px;
-        list-style: none;
-        li{
-            border-bottom: 1px solid white;
-        }
-    }
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    // height: 1em;
+    background-color: rgba(0, 0, 0, 0);
+    color: #fff;
+    text-align: center;
+    padding: $smallMargin;
+    border-radius: 1em;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+    -webkit-transition: all .25s; 
+        -moz-transition: all .25s;
+        -o-transition: all .25s;
+            transition: all .25s; 
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    background-color: rgb(0, 0, 0);
+    visibility: visible;
+}
+
+#mousetracker{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100px;
+    height: 100%;
+    z-index: 100;
+}
+
+#loginModal{
+    position: absolute;
+}
+
+#loginFormsInnerContainer{
+    height: 100%;
+    position: absolute;
+    -webkit-transition: all .5s; 
+        -moz-transition: all .5s;
+        -o-transition: all .5s;
+            transition: all .5s; 
 }

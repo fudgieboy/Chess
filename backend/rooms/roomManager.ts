@@ -2,8 +2,6 @@ const uniqid = require("uniqid");
 import Gamelogic from '../../shared/gamelogic';
 import Player from "../players/player";
 
-//remove gamelogic and socket connections from main server file
-
 //TODO: add room renaming
 //TODO: display all players in room next to room
 //TODO: this is in two places
@@ -13,11 +11,13 @@ import Player from "../players/player";
 //TODO: add queue for spectate option
 //TODO: create list of rooms with players and spectators
 //TODO: identify room owner to players
-//TODO: allow room owner to kick players
-//TODO :enable inviting of players
+//TODO: enable inviting of players
 //TODO: add friendlist support
 //TODO: add basic chat
 //TODO: keep track ofusers that joined and left game so they can't rejoin the same game unless invited
+//TODO: don't allow room or username less than 4 characters
+//TODO: when the new name is 0 length the wrong name gets changed
+
 type userString = string;
 type roomString = string;
 
@@ -25,11 +25,11 @@ class Room{
   constructor(userID:userString){
     this.ownerID = userID;
     this.gameID = uniqid();
+    this.name = this.gameID;
     this.players = [];
-    this.players.push(userID);
     this.spectators = [];
+    this.players.push(userID);
     this.game = Gamelogic();
-
     this.shuttingDown = false;
   }
 
@@ -42,7 +42,6 @@ class Room{
   }
 
   //check if remaining player is not owner. if not owner set owner to someone else
-
   closeRoom = () => { 
     this.shuttingDown = true;
   }
@@ -94,16 +93,23 @@ class Room{
   getRoomID = () :roomString => {
     return this.gameID;
   }
+  setRoomID = () :roomString => {
+    return this.gameID;
+  }
 
   getOwnerID = () :userString => {
     return this.ownerID;
   }
 
+  setOwnerID = (newID) => {
+    this.ownerID = newID;
+  }
+
   setName = (newName) => {
     this.name = newName;
   }
-  setOwnerID = (newID) => {
-    this.ownerID = newID;
+  getName = () => {
+    return this.name;
   }
 
   getAllOccupants = () => {};
@@ -210,10 +216,10 @@ class RoomManager{
   }
 
   getOtherRoomOccupants =()=>{
-    this.getRoomOccupants();
+    // this.getRoomOccupants(ignoreIndex);
   }
 
-  getRoomOccupants = ()=> {
+  getRoomOccupants = (ignoreIndex)=> {
     
   }
   
@@ -226,7 +232,6 @@ class RoomManager{
   };
 
   getConstructedGrid = (roomID, userID) => {
-
   };
 
   getBasicBoard = (roomID, userID) => {
@@ -236,14 +241,22 @@ class RoomManager{
   getAllRoomIds = () => {
     const roomIDs:any = []; 
     for(const i in this.rooms){
-      roomIDs.push(this.rooms[i].getRoomID());
+      roomIDs.push(this.rooms[i].getName());
     }
     return roomIDs;
   }
 
-  renameRoom = (targetRoom, userID, newName) => {
+  renameRoom = (targetRoom, userID, newName, cb) => {
+
+    console.log(targetRoom, userID, newName);
+    
+    this.rooms[targetRoom].setOwnerID("Q34352532%#%@#");
+
     if(this.rooms[targetRoom].getOwnerID() == userID){
       this.rooms[targetRoom].setName(newName);
+      cb(true);
+    } else {
+      cb(false);
     }
   }
 

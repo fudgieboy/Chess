@@ -51,13 +51,47 @@ const Main: React.FC = () : ReactElement => {
     };
   }, []);
 
-  const loginInnerContainerClasses = ( loggedIn ?"hidden": "") + " anim";
+  const loginInnerContainerClasses = (loggedIn ?"hidden": "") + " anim innerContainer";
 
+
+  const [coord, setCoord] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e) => {
+    // console.log(e);
+    if(e.target.id === "loginFormsInnerContainer"){
+      setCoord({ x: e.pageX, y: e.pageY });
+    }
+  };
+
+  let lerp = {
+    identity: function(t){
+        t = Math.max(0,Math.min(1,t));
+        return t;
+    },
+    cubic: function(t){
+        t = Math.max(0,Math.min(1,t));
+        if(2*t<<0){
+            return 4*(t-1)*(t-1)*(t-1)+1;
+        } else {
+            return 4*t*t*t;
+        }
+    },
+    elastic: function(t){
+        t = Math.max(0,Math.min(1,t));
+        const range = 10.5 * Math.PI;
+        return (range - Math.sin(range*t)/t)/(range - 1);
+    }
+  };
+  
   return (
     // <Router>
       <div id = "main">
+          {/* <div id="mousetracker" onMouseMove={(e)=>{handleMouseMove(e);}}>
+            <h1>
+              Mouse coordinates: {coord.x} {coord.y}
+            </h1>
+          </div> */}
           <div id = "header">
-            <h1>Chess</h1>
+            <h1>ChessRTS</h1>
           </div>
           <div id = "leftBar">
             {/* <Routes> */}
@@ -79,18 +113,20 @@ const Main: React.FC = () : ReactElement => {
               <Route path = "/custom">Custom Rules</Route> */}
 
               <ul>
-                <li><a href= "#">New Online Game</a></li>
-                <li><a>Watch</a></li>
-                <li><a>Old games</a></li>
-                <li><a>Change Mode</a></li>
+                <li><a href= "#" className="tooltip anim">New Online Game<span className = "tooltiptext">Start a new random match-made game</span></a></li>
+                <li><a className="tooltip anim2" >Watch<span className = "tooltiptext">Spectate any public game</span></a></li>
+                <li><a className="tooltip anim2" >Old games<span className = "tooltiptext">Review your old games move by move!</span></a></li>
+                <li><a className="tooltip anim2" >Change Mode</a></li>
                   <ul>
-                    <li><a>Classic</a></li>
-                    <li><a>Custom</a></li>
-                    <li><a>Practice</a></li>
-                    <li><a>5 Second Moves</a></li>
-                    <li><a>Tag Team</a></li>
-                    <li><a>Tag Team 5 Sec</a></li>
-                    <li><a>Practice</a></li>
+                    <li><a className="tooltip anim2">Classic<span className = "tooltiptext">Classic Chess with standard rules</span></a></li>
+                    <li><a className="tooltip anim2">Custom<span className = "tooltiptext">Custom game</span></a></li>
+                    <li><a className="tooltip anim2">5 Second Moves<span className = "tooltiptext">5 seconds maximum to make a move</span></a></li>
+                    <li><a className="tooltip anim2">Tag Team<span className = "tooltiptext">Switch turns with a teammate who will assist in moving your pieces</span></a></li>
+                    <li><a className="tooltip anim2">Tag Team 5 Sec<span className = "tooltiptext">Alternating turns with a teammate, but with maximum 5 second turns</span></a></li>
+                    <li><a className="tooltip anim2">Battle Royale<span className = "tooltiptext">Open world multiplayer combat</span></a></li>
+                    <li><a className="tooltip anim2">RTS Royale<span className = "tooltiptext">Open world multiplayer combat with resources to fight over</span></a></li>
+                    <li><a className="tooltip anim2">Practice<span className = "tooltiptext">Practice against training or other players</span></a></li>
+                    <li><a className="tooltip anim2">Puzzles<span className = "tooltiptext">Hone your skills using constructed puzzles</span></a></li>
                   </ul>
 
                 {/* <li><a>Famous Games</a></li> */}
@@ -102,10 +138,13 @@ const Main: React.FC = () : ReactElement => {
             {/* </Routes> */}
           </div>
           <Chessboard />
-           <div id = "loginFormsContainer">
-            <div className = {loginInnerContainerClasses} >
-              {!unmountLoginForms ? <Register hideSelf = {hideLoginForms} showSelf = {revealLoginForms} /> :null}
-              {!unmountLoginForms ? <Login  hideSelf = {hideLoginForms} showSelf = {revealLoginForms}/> :null}
+          {/* <div id = "loginFormsContainer" style={{display: (loggedIn?"none":"block")}}  onClick = {()=>{ console.log(LocalStore.store.getLoggedIn(), LocalStore.store.getLoginExpiryTime());}} > */}
+          <div id = "loginFormsContainer"  >
+            <div id = "loginFormsInnerContainer" onMouseMove={(e)=>{handleMouseMove(e);}} style={{paddingTop: coord.y + "px"}} >
+              <div className = {loginInnerContainerClasses}>
+                {!unmountLoginForms ? <Register hideSelf = {hideLoginForms} showSelf = {revealLoginForms} /> :<></>}
+                {!unmountLoginForms ? <Login  hideSelf = {hideLoginForms} showSelf = {revealLoginForms} /> :<></>}
+              </div>
             </div>
           </div> 
       </div>
