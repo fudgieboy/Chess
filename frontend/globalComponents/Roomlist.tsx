@@ -33,6 +33,7 @@ const Roomlist: React.FC<RoomlistProps> = (props:RoomlistProps): ReactElement =>
 
     for(let k = 0; k < rooms.length; k++){
       list.push(<Room name = {rooms[k]} 
+        key = {uniqid()}
         joinRoom = {props.joinRoom}
         getRoomInfo = {getRoomInfo}
         updateRoomNameInList = {updateRoomName}

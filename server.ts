@@ -14,6 +14,7 @@ import {initiateWss} from "./backend/sockets/socketConnection";
 // import { initiateLogger } from "./backend/logging/logManager";
 import { RoomManager as RoomManager2} from "./backend/rooms/roomManager";
 const uniqid = require("uniqid");
+const winston = require('winston');
 
 import {connection} from "./backend/dataAccess/dbConnection";
 import listRoutes from "./backend/list/listRoutes";
@@ -25,6 +26,27 @@ const WSPORT = 8081;
 
 console.log(`***WS port on ${WSPORT + 1}`);
 console.log(`***WS port is ${typeof(WSPORT)}`);
+
+const logConfiguration = {
+  'transports': [
+      new winston.transports.Console(),
+      new winston.transports.File({
+        filename: 'logs/mainLog.txt'
+      })
+  ]
+};
+
+const slogConfiguration = {
+  'transports': [
+      new winston.transports.Console(),
+      new winston.transports.File({
+        filename: 'logs/socketMessages.txt'
+      })
+  ]
+};
+
+const slogger = winston.createLogger(slogConfiguration);
+const logger = winston.createLogger(logConfiguration);
 
 const app = express();
 const server = createServer();
@@ -78,13 +100,13 @@ if(curEnv == "production"){
 
 app.get("/", (req,res) => {
 
-  // const message = {header: req.header, body: req.body, query: req.query, cookies: req.cookies, userToken: req.userToken, curEnv: curEnv, ip: req.socket.remoteAddress};
+   const message = {header: req.header, body: req.body, query: req.query, cookies: req.cookies, userToken: req.userToken, curEnv: curEnv, ip: req.socket.remoteAddress};
 
   //call the logger manager and make it do this instead
-  // logger.log({
-  //   message: message,
-  //   level: 'info'
-  // });
+   logger.log({
+     message: message,
+     level: 'info'
+   });
 
   res.render(path.resolve(__dirname, dirPrefix + "dist", "index.ejs"), {
     socketPort: WSPORT
